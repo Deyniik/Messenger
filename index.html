@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             background: #f5f7fa;
-            color: #333;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -17,20 +16,20 @@
         }
         .player {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 25px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 350px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             text-align: center;
         }
         .cover {
-            width: 250px;
-            height: 250px;
-            border-radius: 15px;
-            margin: 0 auto 20px;
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin: 0 auto 15px;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            background: #eee;
         }
         .cover img {
             width: 100%;
@@ -38,115 +37,48 @@
             object-fit: cover;
         }
         .song-title {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: bold;
             margin-bottom: 5px;
-            color: #6c5ce7;
         }
         .artist {
             font-size: 16px;
             color: #666;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         audio {
             width: 100%;
-            margin-top: 20px;
-            outline: none;
+            margin-top: 15px;
         }
-        .progress-container {
-            width: 100%;
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            margin: 15px 0;
-            cursor: pointer;
-        }
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
-            border-radius: 2px;
-            width: 0%;
-        }
-        .time {
-            display: flex;
-            justify-content: space-between;
+        .download-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 15px;
+            background: #6c5ce7;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
             font-size: 14px;
-            color: #888;
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="player">
-        <!-- Обложка -->
         <div class="cover">
-            <img src="https://i.imgur.com/JrQhY7x.jpg" alt="Обложка" id="cover">
+            <img src="https://i.ibb.co/0jQ5Z4T/cover.jpg" alt="Обложка">
         </div>
-        
-        <!-- Информация о треке -->
         <h1 class="song-title">Обезьянка-ноль</h1>
         <p class="artist">Алёна Швец</p>
         
-        <!-- Прогресс-бар -->
-        <div class="progress-container" id="progress-container">
-            <div class="progress" id="progress"></div>
-        </div>
-        <div class="time">
-            <span id="current-time">0:00</span>
-            <span id="duration">3:48</span>
-        </div>
-        
-        <!-- Аудиоплеер -->
-        <audio controls id="audio-player">
-            <source src="https://tgmusicproxy.vercel.app/audio?id=AAMCAgADIQUABKcMEFMAAxtohva-F2BepPt--eYHJ02o1TBVlAACzYMAAsU7OUhMsQdUDE3CpAEAB20AAzYE" type="audio/mpeg">
+        <!-- Прямая ссылка на Google Drive -->
+        <audio controls>
+            <source src="https://drive.google.com/uc?export=download&id=1ii5LL1bm51XeMoolPhAFqliAdqbX9iwG" type="audio/mpeg">
             Ваш браузер не поддерживает аудио элемент.
         </audio>
+        
+        <a href="https://drive.google.com/uc?export=download&id=1ii5LL1bm51XeMoolPhAFqliAdqbX9iwG" class="download-btn" download>
+            Скачать трек
+        </a>
     </div>
-
-    <script>
-        // Элементы управления
-        const audio = document.getElementById('audio-player');
-        const progress = document.getElementById('progress');
-        const progressContainer = document.getElementById('progress-container');
-        const currentTimeEl = document.getElementById('current-time');
-        const durationEl = document.getElementById('duration');
-
-        // Обновление прогресса
-        audio.addEventListener('timeupdate', updateProgress);
-        
-        function updateProgress() {
-            const { duration, currentTime } = audio;
-            const progressPercent = (currentTime / duration) * 100;
-            progress.style.width = `${progressPercent}%`;
-            currentTimeEl.textContent = formatTime(currentTime);
-        }
-
-        // Перемотка при клике
-        progressContainer.addEventListener('click', setProgress);
-        
-        function setProgress(e) {
-            const width = this.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            audio.currentTime = (clickX / width) * duration;
-        }
-
-        // Форматирование времени
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-        }
-
-        // Когда метаданные загружены
-        audio.addEventListener('loadedmetadata', () => {
-            durationEl.textContent = formatTime(audio.duration);
-        });
-
-        // Автовоспроизведение
-        audio.play().catch(e => {
-            console.log("Нажми ▶ вручную");
-        });
-    </script>
 </body>
 </html>
