@@ -1,41 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TG Music Player</title>
+    <title>Мой плеер</title>
     <style>
-        body { font-family: Arial; background: #1e1e1e; color: white; text-align: center; padding: 20px; }
-        audio { width: 80%; margin: 20px auto; display: block; }
-        .track { background: #333; padding: 15px; border-radius: 10px; margin: 10px; }
+        body { font-family: Arial; background: black; color: white; text-align: center; padding: 20px; }
+        audio { width: 100%; margin: 20px 0; }
     </style>
 </head>
 <body>
-    <h1>🎵 Плеер для Telegram-треков</h1>
-    <div id="playlist"></div>
-
-    <script>
-        // Ваши треки (file_id берем из @getidsbot)
-        const playlist = [
-            {
-                title: "Aura",
-                artist: "Lady Gaga",
-                file_id: "AgACAgEAAxkBAiQFjWiG67A2zVklsPdq1vSvy0vTCvWQAAJHgwACxTs5SJ99rBw68dMhAQAHbQADNgQ",
-                duration: "3:55"
-            }
-            // Добавьте другие треки
-        ];
-
-        // Рендер плейлиста
-        const playlistEl = document.getElementById('playlist');
-        playlist.forEach(track => {
-            const trackDiv = document.createElement('div');
-            trackDiv.className = 'track';
-            trackDiv.innerHTML = `
-                <h3>${track.title}</h3>
-                <p>${track.artist} • ${track.duration}</p>
-                <audio controls src="https://tg-file-proxy.vercel.app/?file_id=${track.file_id}"></audio>
-            `;
-            playlistEl.appendChild(trackDiv);
-        });
-    </script>
+    <h1>♫ Мой плейлист</h1>
+    
+    <!-- Трек 1 -->
+    <p><b>Aura</b> — Lady Gaga (3:55)</p>
+    <audio controls src="https://tg-music-proxy.fly.dev/?file_id=AgACAgEAAxkBAiQFjWiG67A2zVklsPdq1vSvy0vTCvWQAAJHgwACxTs5SJ99rBw68dMhAQAHbQADNgQ"></audio>
+    
+    <!-- Трек 2 (добавь свой) -->
+    <!-- <p><b>Название</b> — Исполнитель (2:30)</p>
+    <audio controls src="https://tg-music-proxy.fly.dev/?file_id=ВСТАВЬ_СВОЙ_FILE_ID"></audio> -->
 </body>
 </html>
