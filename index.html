@@ -57,7 +57,7 @@
 <body>
     <div class="player">
         <div class="cover">
-            <img src="https://img.discogs.com/XXXXX.jpg" alt="Обложка" id="cover">
+            <img src="https://via.placeholder.com/300" alt="Обложка" id="cover">
         </div>
         
         <div class="song-info">
@@ -66,15 +66,13 @@
         </div>
         
         <audio controls id="audio-player">
+            <!-- ВАШ РЕАЛЬНЫЙ file_id ИЗ СООБЩЕНИЯ БОТА -->
             <source src="https://tg-music-proxy.fly.dev/?file_id=AAMCAgADIQUABKcMEFMAAxlohvLQQipk43iXq9AeVwphLpNmJQACl4MAAsU7OUgmjA4EatqbUAEAB20AAzYE" type="audio/mp4">
             Ваш браузер не поддерживает аудио элемент.
         </audio>
     </div>
 
     <script>
-        // Автоматическое обновление обложки (если есть)
-        document.getElementById('cover').src = 'https://img.discogs.com/XXXXX.jpg';
-        
         // Автовоспроизведение (если нужно)
         document.getElementById('audio-player').addEventListener('canplay', function() {
             this.play().catch(e => console.log("Автовоспроизведение заблокировано"));
