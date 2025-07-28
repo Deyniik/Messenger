@@ -1,81 +1,151 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lady Gaga - TEA</title>
+    <title>Алёна Швец - Обезьянка-ноль</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #121212;
-            color: white;
-            text-align: center;
-            padding: 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .player {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
             max-width: 400px;
-            margin: 0 auto;
-            background: #1e1e1e;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
         }
         .cover {
-            width: 200px;
-            height: 200px;
-            border-radius: 10px;
+            width: 250px;
+            height: 250px;
+            border-radius: 15px;
             margin: 0 auto 20px;
             overflow: hidden;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
         .cover img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .song-info {
-            margin-bottom: 20px;
-        }
         .song-title {
-            font-size: 22px;
-            font-weight: bold;
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 5px;
+            color: #6c5ce7;
         }
         .artist {
             font-size: 16px;
-            color: #aaa;
-            margin-bottom: 20px;
+            color: #666;
+            margin-bottom: 25px;
         }
         audio {
             width: 100%;
-            margin-top: 15px;
-            background: #333;
-            border-radius: 8px;
-            padding: 5px;
+            margin-top: 20px;
+            outline: none;
+        }
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+            border-radius: 2px;
+            width: 0%;
+        }
+        .time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="player">
+        <!-- Обложка -->
         <div class="cover">
-            <img src="https://via.placeholder.com/300" alt="Обложка" id="cover">
+            <img src="https://i.imgur.com/JrQhY7x.jpg" alt="Обложка" id="cover">
         </div>
         
-        <div class="song-info">
-            <h1 class="song-title">TEA</h1>
-            <p class="artist">Lady Gaga</p>
+        <!-- Информация о треке -->
+        <h1 class="song-title">Обезьянка-ноль</h1>
+        <p class="artist">Алёна Швец</p>
+        
+        <!-- Прогресс-бар -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="time">
+            <span id="current-time">0:00</span>
+            <span id="duration">3:48</span>
         </div>
         
+        <!-- Аудиоплеер -->
         <audio controls id="audio-player">
-            <!-- ВАШ РЕАЛЬНЫЙ file_id ИЗ СООБЩЕНИЯ БОТА -->
-            <source src="https://tg-music-proxy.fly.dev/?file_id=AAMCAgADIQUABKcMEFMAAxlohvLQQipk43iXq9AeVwphLpNmJQACl4MAAsU7OUgmjA4EatqbUAEAB20AAzYE" type="audio/mp4">
+            <source src="https://tgmusicproxy.vercel.app/audio?id=AAMCAgADIQUABKcMEFMAAxtohva-F2BepPt--eYHJ02o1TBVlAACzYMAAsU7OUhMsQdUDE3CpAEAB20AAzYE" type="audio/mpeg">
             Ваш браузер не поддерживает аудио элемент.
         </audio>
     </div>
 
     <script>
-        // Автовоспроизведение (если нужно)
-        document.getElementById('audio-player').addEventListener('canplay', function() {
-            this.play().catch(e => console.log("Автовоспроизведение заблокировано"));
+        // Элементы управления
+        const audio = document.getElementById('audio-player');
+        const progress = document.getElementById('progress');
+        const progressContainer = document.getElementById('progress-container');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+
+        // Обновление прогресса
+        audio.addEventListener('timeupdate', updateProgress);
+        
+        function updateProgress() {
+            const { duration, currentTime } = audio;
+            const progressPercent = (currentTime / duration) * 100;
+            progress.style.width = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+
+        // Перемотка при клике
+        progressContainer.addEventListener('click', setProgress);
+        
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        // Форматирование времени
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Когда метаданные загружены
+        audio.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = formatTime(audio.duration);
+        });
+
+        // Автовоспроизведение
+        audio.play().catch(e => {
+            console.log("Нажми ▶ вручную");
         });
     </script>
 </body>
