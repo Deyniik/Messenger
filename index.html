@@ -1,21 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Мой плеер</title>
+    <title>Lady Gaga - TEA</title>
     <style>
-        body { font-family: Arial; background: black; color: white; text-align: center; padding: 20px; }
-        audio { width: 100%; margin: 20px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .player {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .cover {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        .cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .song-info {
+            margin-bottom: 20px;
+        }
+        .song-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .artist {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        audio {
+            width: 100%;
+            margin-top: 15px;
+            background: #333;
+            border-radius: 8px;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>♫ Мой плейлист</h1>
-    
-    <!-- Трек 1 -->
-    <p><b>Aura</b> — Lady Gaga (3:55)</p>
-    <audio controls src="https://tg-music-proxy.fly.dev/?file_id=AgACAgEAAxkBAiQFjWiG67A2zVklsPdq1vSvy0vTCvWQAAJHgwACxTs5SJ99rBw68dMhAQAHbQADNgQ"></audio>
-    
-    <!-- Трек 2 (добавь свой) -->
-    <!-- <p><b>Название</b> — Исполнитель (2:30)</p>
-    <audio controls src="https://tg-music-proxy.fly.dev/?file_id=ВСТАВЬ_СВОЙ_FILE_ID"></audio> -->
+    <div class="player">
+        <div class="cover">
+            <img src="https://img.discogs.com/XXXXX.jpg" alt="Обложка" id="cover">
+        </div>
+        
+        <div class="song-info">
+            <h1 class="song-title">TEA</h1>
+            <p class="artist">Lady Gaga</p>
+        </div>
+        
+        <audio controls id="audio-player">
+            <source src="https://tg-music-proxy.fly.dev/?file_id=AAMCAgADIQUABKcMEFMAAxlohvLQQipk43iXq9AeVwphLpNmJQACl4MAAsU7OUgmjA4EatqbUAEAB20AAzYE" type="audio/mp4">
+            Ваш браузер не поддерживает аудио элемент.
+        </audio>
+    </div>
+
+    <script>
+        // Автоматическое обновление обложки (если есть)
+        document.getElementById('cover').src = 'https://img.discogs.com/XXXXX.jpg';
+        
+        // Автовоспроизведение (если нужно)
+        document.getElementById('audio-player').addEventListener('canplay', function() {
+            this.play().catch(e => console.log("Автовоспроизведение заблокировано"));
+        });
+    </script>
 </body>
 </html>
