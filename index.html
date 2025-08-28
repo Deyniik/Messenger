@@ -156,6 +156,9 @@
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .chat-wrapper {
@@ -170,6 +173,39 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stream-error {
+            text-align: center;
+            padding: 20px;
+            background: #2A2A2A;
+            border-radius: 8px;
+            max-width: 500px;
+        }
+        
+        .stream-error h3 {
+            color: #ff4d4d;
+            margin-bottom: 15px;
+        }
+        
+        .stream-error p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .stream-link {
+            display: inline-block;
+            background: #68523A;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .stream-link:hover {
+            background: #7D6347;
         }
         
         /* Адаптивность */
@@ -261,25 +297,21 @@
             <div class="stream-container">
                 <div class="stream-wrapper">
                     <div class="twitch-player" id="twitchPlayer">
-                        <iframe 
-                            src="https://player.twitch.tv/?channel=sobiratei&parent=localhost&autoplay=true" 
-                            frameborder="0" 
-                            allowfullscreen="true" 
-                            scrolling="no" 
-                            height="100%" 
-                            width="100%">
-                        </iframe>
+                        <div class="stream-error">
+                            <h3>Проблема с загрузкой стрима</h3>
+                            <p>Twitch блокирует встраивание на этой странице. Для просмотра стрима перейдите на официальную страницу канала.</p>
+                            <a href="https://www.twitch.tv/sobiratei" class="stream-link" target="_blank">Смотреть на Twitch</a>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="chat-wrapper">
                     <div class="twitch-chat" id="twitchChat">
-                        <iframe
-                            id="chat_embed"
-                            src="https://www.twitch.tv/embed/sobiratei/chat?parent=localhost&darkpopout"
-                            height="100%"
-                            width="100%">
-                        </iframe>
+                        <div class="stream-error" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                            <h3>Чат недоступен</h3>
+                            <p>Для участия в чате перейдите на официальную страницу канала на Twitch.</p>
+                            <a href="https://www.twitch.tv/sobiratei" class="stream-link" target="_blank">Перейти к чату</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -327,6 +359,56 @@
             // Показываем страницу стрима
             const streamPage = document.getElementById('streamPage');
             streamPage.style.display = 'flex';
+            
+            // Пытаемся загрузить стрим (скорее всего будет заблокировано)
+            try {
+                const playerContainer = document.getElementById('twitchPlayer');
+                playerContainer.innerHTML = `
+                    <iframe 
+                        src="https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}&autoplay=true" 
+                        frameborder="0" 
+                        allowfullscreen="true" 
+                        scrolling="no" 
+                        height="100%" 
+                        width="100%">
+                    </iframe>
+                `;
+                
+                const chatContainer = document.getElementById('twitchChat');
+                chatContainer.innerHTML = `
+                    <iframe
+                        src="https://www.twitch.tv/embed/${channel}/chat?parent=${window.location.hostname}&darkpopout"
+                        height="100%"
+                        width="100%">
+                    </iframe>
+                `;
+                
+                // Проверяем, загрузился ли контент
+                setTimeout(() => {
+                    const iframe = playerContainer.querySelector('iframe');
+                    if (iframe && iframe.contentWindow.document.body.innerHTML === '') {
+                        throw new Error('Twitch blocked the embed');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                // Если произошла ошибка, показываем сообщение
+                document.getElementById('twitchPlayer').innerHTML = `
+                    <div class="stream-error">
+                        <h3>Проблема с загрузкой стрима</h3>
+                        <p>Twitch блокирует встраивание на этой странице. Для просмотра стрима перейдите на официальную страницу канала.</p>
+                        <a href="https://www.twitch.tv/${channel}" class="stream-link" target="_blank">Смотреть на Twitch</a>
+                    </div>
+                `;
+                
+                document.getElementById('twitchChat').innerHTML = `
+                    <div class="stream-error" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                        <h3>Чат недоступен</h3>
+                        <p>Для участия в чате перейдите на официальную страницу канала на Twitch.</p>
+                        <a href="https://www.twitch.tv/${channel}" class="stream-link" target="_blank">Перейти к чату</a>
+                    </div>
+                `;
+            }
             
             // Обновляем активную кнопку
             document.querySelectorAll('.btn').forEach(btn => {
