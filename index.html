@@ -3,432 +3,773 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeynikStreams</title>
+    <title>Календарь будильников</title>
     <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #4a8cff;
+            --accent-hover: #5d9dff;
+            --danger: #ff4d4d;
+            --border: #333333;
+            --today: #4a8cff;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
         }
         
         body {
-            background: #1A1A1A;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
-            color: white;
-        }
-        
-        /* Боковая панель */
-        .sidebar {
-            width: 250px;
-            background: #1A1A1A;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
-            height: 100vh;
-            border-right: 2px solid #68523A;
-            overflow-y: auto;
         }
         
-        .logo {
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
             text-align: center;
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #68523A;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            width: 100%;
         }
         
-        .logo h1 {
-            font-size: 24px;
-            color: white;
-            margin-bottom: 5px;
-        }
-        
-        .buttons-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .btn {
-            padding: 15px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        h1 {
             font-weight: 600;
-            text-align: left;
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .current-time {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .calendar-day {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 180px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day.today {
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 2px var(--today);
+        }
+        
+        .calendar-day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .day-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #68523A;
-            color: white;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border);
         }
         
-        .btn:hover {
-            background: #7D6347;
-            transform: translateX(5px);
+        .day-name {
+            font-size: 14px;
+            color: var(--text-secondary);
         }
         
-        .btn.active {
-            background: #8C7355;
-            box-shadow: 0 0 0 2px rgba(140, 115, 85, 0.5);
+        .day-number {
+            font-weight: 600;
+            font-size: 18px;
         }
         
-        /* Основной контент */
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        
-        .iframe-wrapper {
-            flex: 1;
-            background: white;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .iframe-header {
-            padding: 15px 20px;
-            background: #2A2A2A;
+        .alarm-item {
+            background: var(--bg-tertiary);
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #68523A;
         }
         
-        .iframe-title {
-            font-size: 18px;
+        .alarm-time {
             font-weight: 600;
-            color: white;
+            color: var(--accent);
         }
         
-        .close-btn {
-            background: #68523A;
+        .alarm-name {
+            flex-grow: 1;
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .delete-alarm {
+            background: none;
             border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 5px;
+            color: var(--danger);
             cursor: pointer;
-            font-weight: 600;
+            font-size: 16px;
         }
         
-        .close-btn:hover {
-            background: #7D6347;
-        }
-        
-        iframe {
-            width: 100%;
-            height: 100%;
+        .add-alarm-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
             border: none;
-            flex: 1;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
         
-        /* Стили для страницы стрима */
-        .stream-page {
+        .add-alarm-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.1);
+        }
+        
+        .modal {
             display: none;
-            flex: 1;
-            flex-direction: column;
-            background: #1A1A1A;
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        .stream-container {
-            display: flex;
-            gap: 20px;
-            height: 100%;
-            padding: 20px;
-        }
-        
-        .stream-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .twitch-player {
-            flex: 1;
-            min-height: 0;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            background: #000;
-            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
             align-items: center;
             justify-content: center;
         }
         
-        .chat-wrapper {
-            width: 350px;
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
             display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .twitch-chat {
-            flex: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .stream-error {
-            text-align: center;
-            padding: 20px;
-            background: #2A2A2A;
-            border-radius: 8px;
-            max-width: 500px;
-        }
-        
-        .stream-error h3 {
-            color: #ff4d4d;
-            margin-bottom: 15px;
-        }
-        
-        .stream-error p {
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            line-height: 1.5;
         }
         
-        .stream-link {
-            display: inline-block;
-            background: #68523A;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        
+        .time-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .time-input input {
+            text-align: center;
+            width: 60px;
+        }
+        
+        .time-separator {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-actions button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: all 0.2s ease;
         }
         
-        .stream-link:hover {
-            background: #7D6347;
+        .btn-cancel {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
         }
         
-        /* Адаптивность */
-        @media (max-width: 1200px) {
-            .stream-container {
-                flex-direction: column;
-                height: auto;
-            }
-            
-            .chat-wrapper {
-                width: 100%;
-                height: 400px;
-                margin-top: 20px;
-            }
+        .btn-save {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: var(--accent-hover);
+        }
+        
+        .alarm-active {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .alarm-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .alarm-title {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        
+        .alarm-message {
+            margin-bottom: 32px;
+            font-size: 18px;
+        }
+        
+        .stop-alarm {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .stop-alarm:hover {
+            background: var(--accent-hover);
+        }
+        
+        .week-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-btn {
+            background: var(--bg-secondary);
+            border: none;
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--accent);
+        }
+        
+        .current-week {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .test-sound-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
         }
         
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
+            .calendar {
+                grid-template-columns: repeat(1, 1fr);
             }
             
-            .sidebar {
-                width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 2px solid #68523A;
-            }
-            
-            .buttons-container {
-                flex-direction: row;
-                overflow-x: auto;
-                padding-bottom: 10px;
-            }
-            
-            .btn {
-                min-width: 200px;
-            }
-            
-            .stream-container {
-                flex-direction: column;
-                padding: 10px;
-            }
-            
-            .chat-wrapper {
-                width: 100%;
-                height: 400px;
+            .calendar-day {
+                min-height: auto;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Боковая панель -->
-    <div class="sidebar">
-        <div class="logo">
-            <h1>DeynikStreams</h1>
+    <div class="container">
+        <header>
+            <h1>Календарь будильников</h1>
+            <div class="current-time" id="current-time">
+                Текущее время: загрузка...
+            </div>
+        </header>
+        
+        <div class="week-navigation">
+            <button class="nav-btn" id="prev-week">←</button>
+            <span class="current-week" id="week-range">Загрузка...</span>
+            <button class="nav-btn" id="next-week">→</button>
         </div>
         
-        <div class="buttons-container">
-            <button class="btn active" onclick="showIframe('blockcolors', 'BlockColors Редактор')">
-                🎨 BlockColors
-            </button>
+        <div class="calendar" id="calendar">
+            <!-- Календарь будет сгенерирован JavaScript -->
+        </div>
+        
+        <button class="test-sound-btn" id="test-sound">Проверить звук будильника</button>
+    </div>
+    
+    <!-- Модальное окно добавления будильника -->
+    <div class="modal" id="alarm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Добавить будильник</h2>
+                <button class="close-modal">&times;</button>
+            </div>
             
-            <button class="btn" onclick="showIframe('minecraft', 'Minecraft Sounds')">
-                ⚒️ Minecraft Sounds
-            </button>
+            <div class="form-group">
+                <label for="alarm-name">Название</label>
+                <input type="text" id="alarm-name" placeholder="Введите название">
+            </div>
             
-            <button class="btn" onclick="showIframe('chillhop', 'Chillhop Music')">
-                🎵 Chillhop Music
-            </button>
+            <div class="form-group">
+                <label for="alarm-date">Дата</label>
+                <input type="date" id="alarm-date">
+            </div>
             
-            <button class="btn" onclick="showStream('sobiratei')">
-                🔴 Собиратель
-            </button>
+            <div class="form-group">
+                <label>Время (24-часовой формат)</label>
+                <div class="time-input">
+                    <input type="number" id="alarm-hours" min="0" max="23" placeholder="00" value="8">
+                    <span class="time-separator">:</span>
+                    <input type="number" id="alarm-minutes" min="0" max="59" placeholder="00" value="00">
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel">Отмена</button>
+                <button class="btn-save">Сохранить</button>
+            </div>
         </div>
     </div>
     
-    <!-- Основной контент -->
-    <div class="content">
-        <div class="iframe-wrapper">
-            <div class="iframe-header">
-                <div class="iframe-title" id="iframeTitle">BlockColors Редактор</div>
-                <button class="close-btn" onclick="hideIframe()">Скрыть</button>
-            </div>
-            <iframe id="mainIframe" src="https://blockcolors.app/edit/new"></iframe>
-        </div>
-        
-        <!-- Страница стрима -->
-        <div class="stream-page" id="streamPage">
-            <div class="stream-container">
-                <div class="stream-wrapper">
-                    <div class="twitch-player" id="twitchPlayer">
-                        <div class="stream-error">
-                            <h3>Проблема с загрузкой стрима</h3>
-                            <p>Twitch блокирует встраивание на этой странице. Для просмотра стрима перейдите на официальную страницу канала.</p>
-                            <a href="https://www.twitch.tv/sobiratei" class="stream-link" target="_blank">Смотреть на Twitch</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="chat-wrapper">
-                    <div class="twitch-chat" id="twitchChat">
-                        <div class="stream-error" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
-                            <h3>Чат недоступен</h3>
-                            <p>Для участия в чате перейдите на официальную страницу канала на Twitch.</p>
-                            <a href="https://www.twitch.tv/sobiratei" class="stream-link" target="_blank">Перейти к чату</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Окно сработавшего будильника -->
+    <div class="alarm-active" id="alarm-active">
+        <div class="alarm-content">
+            <h2 class="alarm-title">Будильник!</h2>
+            <p class="alarm-message" id="alarm-message">Время пришло!</p>
+            <button class="stop-alarm" id="stop-alarm">Выключить</button>
         </div>
     </div>
+    
+    <!-- Аудио элемент для будильника -->
+    <audio id="alarm-sound" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        function showIframe(type, title) {
-            // Скрываем страницу стрима
-            document.getElementById('streamPage').style.display = 'none';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Текущая дата и отображаемая неделя
+            let currentDate = new Date();
+            let currentWeekStart = getMonday(currentDate);
             
-            // Показываем iframe контейнер
-            document.querySelector('.iframe-wrapper').style.display = 'flex';
+            // Аудио элемент
+            const alarmSound = document.getElementById('alarm-sound');
             
-            const iframe = document.getElementById('mainIframe');
-            const iframeTitle = document.getElementById('iframeTitle');
-            
-            let url;
-            switch(type) {
-                case 'blockcolors':
-                    url = 'https://blockcolors.app/edit/new';
-                    break;
-                case 'minecraft':
-                    url = 'https://minecraftsounds.com/?utm_source=chatgpt.com#?tags=liquid';
-                    break;
-                case 'chillhop':
-                    url = 'https://app.chillhop.com/';
-                    break;
+            // Обновление текущего времени
+            function updateCurrentTime() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('ru-RU');
+                document.getElementById('current-time').textContent = `Текущее время: ${timeString}`;
+                
+                // Проверяем будильники каждую секунду
+                checkAlarms(now);
             }
             
-            iframeTitle.textContent = title;
-            iframe.src = url;
+            setInterval(updateCurrentTime, 1000);
+            updateCurrentTime();
             
-            // Обновляем активную кнопку
-            document.querySelectorAll('.btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-        
-        function showStream(channel) {
-            // Скрываем iframe контейнер
-            document.querySelector('.iframe-wrapper').style.display = 'none';
+            // Функция для получения понедельника текущей недели
+            function getMonday(date) {
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+                return new Date(date.setDate(diff));
+            }
             
-            // Показываем страницу стрима
-            const streamPage = document.getElementById('streamPage');
-            streamPage.style.display = 'flex';
+            // Форматирование даты для отображения
+            function formatDate(date) {
+                return date.toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
             
-            // Пытаемся загрузить стрим (скорее всего будет заблокировано)
-            try {
-                const playerContainer = document.getElementById('twitchPlayer');
-                playerContainer.innerHTML = `
-                    <iframe 
-                        src="https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}&autoplay=true" 
-                        frameborder="0" 
-                        allowfullscreen="true" 
-                        scrolling="no" 
-                        height="100%" 
-                        width="100%">
-                    </iframe>
-                `;
+            // Форматирование даты для диапазона недели
+            function formatWeekRange(startDate) {
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 6);
                 
-                const chatContainer = document.getElementById('twitchChat');
-                chatContainer.innerHTML = `
-                    <iframe
-                        src="https://www.twitch.tv/embed/${channel}/chat?parent=${window.location.hostname}&darkpopout"
-                        height="100%"
-                        width="100%">
-                    </iframe>
-                `;
+                return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+            }
+            
+            // Генерация календаря на неделю
+            function generateCalendar() {
+                const calendarEl = document.getElementById('calendar');
+                const weekRangeEl = document.getElementById('week-range');
                 
-                // Проверяем, загрузился ли контент
-                setTimeout(() => {
-                    const iframe = playerContainer.querySelector('iframe');
-                    if (iframe && iframe.contentWindow.document.body.innerHTML === '') {
-                        throw new Error('Twitch blocked the embed');
+                // Обновляем отображение диапазона недели
+                weekRangeEl.textContent = formatWeekRange(new Date(currentWeekStart));
+                
+                // Очищаем календарь
+                calendarEl.innerHTML = '';
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Создаем дни недели
+                for (let i = 0; i < 7; i++) {
+                    const dayDate = new Date(currentWeekStart);
+                    dayDate.setDate(currentWeekStart.getDate() + i);
+                    
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'calendar-day';
+                    
+                    // Проверяем, является ли день сегодняшним
+                    const checkToday = new Date(dayDate);
+                    checkToday.setHours(0, 0, 0, 0);
+                    if (checkToday.getTime() === today.getTime()) {
+                        dayEl.classList.add('today');
                     }
-                }, 2000);
-                
-            } catch (error) {
-                // Если произошла ошибка, показываем сообщение
-                document.getElementById('twitchPlayer').innerHTML = `
-                    <div class="stream-error">
-                        <h3>Проблема с загрузкой стрима</h3>
-                        <p>Twitch блокирует встраивание на этой странице. Для просмотра стрима перейдите на официальную страницу канала.</p>
-                        <a href="https://www.twitch.tv/${channel}" class="stream-link" target="_blank">Смотреть на Twitch</a>
-                    </div>
-                `;
-                
-                document.getElementById('twitchChat').innerHTML = `
-                    <div class="stream-error" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
-                        <h3>Чат недоступен</h3>
-                        <p>Для участия в чате перейдите на официальную страницу канала на Twitch.</p>
-                        <a href="https://www.twitch.tv/${channel}" class="stream-link" target="_blank">Перейти к чату</a>
-                    </div>
-                `;
+                    
+                    const dayName = dayDate.toLocaleDateString('ru-RU', { weekday: 'short' }).toUpperCase();
+                    const dayNumber = dayDate.getDate();
+                    
+                    dayEl.innerHTML = `
+                        <div class="day-header">
+                            <span class="day-name">${dayName}</span>
+                            <span class="day-number">${dayNumber}</span>
+                        </div>
+                        <button class="add-alarm-btn">+</button>
+                    `;
+                    
+                    // Добавляем обработчик для кнопки добавления будильника
+                    dayEl.querySelector('.add-alarm-btn').addEventListener('click', function() {
+                        openModal(dayDate);
+                    });
+                    
+                    // Загружаем будильники для этого дня
+                    loadAlarmsForDay(dayDate, dayEl);
+                    
+                    calendarEl.appendChild(dayEl);
+                }
             }
             
-            // Обновляем активную кнопку
-            document.querySelectorAll('.btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-        
-        function hideIframe() {
-            const iframe = document.getElementById('mainIframe');
-            iframe.src = 'about:blank';
+            // Загрузка будильников для определенного дня
+            function loadAlarmsForDay(dayDate, dayEl) {
+                const dateKey = formatDateKey(dayDate);
+                const alarms = JSON.parse(localStorage.getItem('alarms') || '{}');
+                
+                if (alarms[dateKey]) {
+                    alarms[dateKey].forEach(alarm => {
+                        const alarmItem = createAlarmElement(alarm, dateKey);
+                        dayEl.insertBefore(alarmItem, dayEl.querySelector('.add-alarm-btn'));
+                    });
+                }
+            }
             
-            const iframeTitle = document.getElementById('iframeTitle');
-            iframeTitle.textContent = 'Выберите инструмент';
+            // Создание элемента будильника
+            function createAlarmElement(alarm, dateKey) {
+                const alarmItem = document.createElement('div');
+                alarmItem.className = 'alarm-item';
+                alarmItem.innerHTML = `
+                    <span class="alarm-time">${alarm.time}</span>
+                    <span class="alarm-name">${alarm.name}</span>
+                    <button class="delete-alarm">×</button>
+                `;
+                
+                // Добавляем обработчик удаления
+                alarmItem.querySelector('.delete-alarm').addEventListener('click', function() {
+                    deleteAlarm(dateKey, alarm.id);
+                    alarmItem.remove();
+                });
+                
+                return alarmItem;
+            }
             
-            // Сбрасываем активную кнопку
-            document.querySelectorAll('.btn').forEach(btn => {
-                btn.classList.remove('active');
+            // Форматирование ключа даты для localStorage
+            function formatDateKey(date) {
+                return date.toISOString().split('T')[0];
+            }
+            
+            // Удаление будильника
+            function deleteAlarm(dateKey, alarmId) {
+                const alarms = JSON.parse(localStorage.getItem('alarms') || '{}');
+                
+                if (alarms[dateKey]) {
+                    alarms[dateKey] = alarms[dateKey].filter(a => a.id !== alarmId);
+                    
+                    if (alarms[dateKey].length === 0) {
+                        delete alarms[dateKey];
+                    }
+                    
+                    localStorage.setItem('alarms', JSON.stringify(alarms));
+                }
+            }
+            
+            // Проверка срабатывания будильников
+            function checkAlarms(now) {
+                const alarms = JSON.parse(localStorage.getItem('alarms') || '{}');
+                const todayKey = formatDateKey(now);
+                
+                if (alarms[todayKey]) {
+                    alarms[todayKey].forEach(alarm => {
+                        const [hours, minutes] = alarm.time.split(':');
+                        const alarmTime = new Date(now);
+                        alarmTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                        
+                        // Будильник срабатывает в течение 60 секунд после установленного времени
+                        if (now >= alarmTime && now < new Date(alarmTime.getTime() + 60000)) {
+                            // Проверяем, не срабатывал ли уже этот будильник
+                            if (!localStorage.getItem(`alarm_${alarm.id}_triggered`)) {
+                                triggerAlarm(alarm);
+                                localStorage.setItem(`alarm_${alarm.id}_triggered`, 'true');
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Срабатывание будильника
+            function triggerAlarm(alarm) {
+                // Показываем окно будильника
+                const alarmActive = document.getElementById('alarm-active');
+                const alarmMessage = document.getElementById('alarm-message');
+                
+                alarmMessage.textContent = `${alarm.time} - ${alarm.name}`;
+                alarmActive.style.display = 'flex';
+                
+                // Воспроизводим звук
+                alarmSound.play().catch(error => {
+                    console.log('Автовоспроизведение заблокировано: ', error);
+                    alert('Разрешите автовоспроизведение звука для этого сайта!');
+                });
+                
+                // Добавляем обработчик для кнопки выключения
+                document.getElementById('stop-alarm').onclick = function() {
+                    alarmActive.style.display = 'none';
+                    alarmSound.pause();
+                    alarmSound.currentTime = 0;
+                };
+            }
+            
+            // Навигация по неделям
+            document.getElementById('prev-week').addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+                generateCalendar();
             });
-        }
+            
+            document.getElementById('next-week').addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                generateCalendar();
+            });
+            
+            // Управление модальным окном
+            const modal = document.getElementById('alarm-modal');
+            const closeModalBtn = document.querySelector('.close-modal');
+            const cancelBtn = document.querySelector('.btn-cancel');
+            const saveBtn = document.querySelector('.btn-save');
+            
+            let selectedDate = new Date();
+            
+            function openModal(date) {
+                selectedDate = new Date(date);
+                
+                // Устанавливаем дату в поле ввода
+                document.getElementById('alarm-date').value = selectedDate.toISOString().split('T')[0];
+                
+                // Устанавливаем текущее время + 10 минут по умолчанию
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 10);
+                
+                document.getElementById('alarm-hours').value = now.getHours();
+                document.getElementById('alarm-minutes').value = now.getMinutes();
+                
+                modal.style.display = 'flex';
+            }
+            
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+            
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Закрытие модального окна при клике вне его
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Сохранение будильника
+            saveBtn.addEventListener('click', function() {
+                const name = document.getElementById('alarm-name').value;
+                const date = new Date(document.getElementById('alarm-date').value);
+                const hours = parseInt(document.getElementById('alarm-hours').value);
+                const minutes = parseInt(document.getElementById('alarm-minutes').value);
+                
+                if (!name) {
+                    alert('Пожалуйста, введите название будильника');
+                    return;
+                }
+                
+                // Форматирование времени в 24-часовом формате
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                // Сбрасываем флаг срабатывания для нового будильника
+                const alarmId = Date.now();
+                localStorage.removeItem(`alarm_${alarmId}_triggered`);
+                
+                // Сохранение будильника
+                saveAlarm({
+                    id: alarmId,
+                    name: name,
+                    time: timeString,
+                    date: date
+                });
+                
+                // Закрываем модальное окно
+                closeModal();
+                
+                // Перезагружаем календарь
+                generateCalendar();
+                
+                // Очищаем форму
+                document.getElementById('alarm-name').value = '';
+            });
+            
+            // Сохранение будильника в localStorage
+            function saveAlarm(alarm) {
+                const dateKey = formatDateKey(alarm.date);
+                const alarms = JSON.parse(localStorage.getItem('alarms') || '{}');
+                
+                if (!alarms[dateKey]) {
+                    alarms[dateKey] = [];
+                }
+                
+                alarms[dateKey].push({
+                    id: alarm.id,
+                    name: alarm.name,
+                    time: alarm.time
+                });
+                
+                localStorage.setItem('alarms', JSON.stringify(alarms));
+            }
+            
+            // Валидация полей времени
+            document.getElementById('alarm-hours').addEventListener('change', function() {
+                if (this.value < 0) this.value = 0;
+                if (this.value > 23) this.value = 23;
+            });
+            
+            document.getElementById('alarm-minutes').addEventListener('change', function() {
+                if (this.value < 0) this.value = 0;
+                if (this.value > 59) this.value = 59;
+            });
+            
+            // Кнопка проверки звука
+            document.getElementById('test-sound').addEventListener('click', function() {
+                alarmSound.play().catch(error => {
+                    console.log('Автовоспроизведение заблокировано: ', error);
+                    alert('Разрешите автовоспроизведение звука для этого сайта!');
+                });
+                
+                const alarmActive = document.getElementById('alarm-active');
+                const alarmMessage = document.getElementById('alarm-message');
+                
+                alarmMessage.textContent = 'Проверка звука будильника';
+                alarmActive.style.display = 'flex';
+            });
+            
+            // Инициализация календаря
+            generateCalendar();
+        });
     </script>
 </body>
 </html>
