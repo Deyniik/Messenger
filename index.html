@@ -1593,18 +1593,35 @@
                 chatSendBtn.disabled = true;
                 chatSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 
-                db.collection('privateMessages').add(message)
-                    .then(() => {
-                        // GIF отправлен
-                    })
-                    .catch(error => {
-                        console.error('Ошибка отправки GIF:', error);
-                        showNotification('Ошибка отправки сообщения', 'error');
-                    })
-                    .finally(() => {
-                        chatSendBtn.disabled = false;
-                        chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                    });
+                // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
+                const collectionsToTry = ['messages', 'privateMessages', 'chats'];
+                
+                function trySendToCollection(collectionName, index) {
+                    db.collection(collectionName).add(message)
+                        .then(() => {
+                            console.log('✅ Сообщение отправлено в коллекцию:', collectionName);
+                            chatInput.value = '';
+                            chatSendBtn.disabled = true;
+                            showNotification('Сообщение отправлено!', 'success');
+                        })
+                        .catch(error => {
+                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
+                            
+                            // Пробуем следующую коллекцию
+                            if (index + 1 < collectionsToTry.length) {
+                                trySendToCollection(collectionsToTry[index + 1], index + 1);
+                            } else {
+                                // Все коллекции провалились
+                                console.error('Все коллекции недоступны');
+                                showNotification('Ошибка отправки сообщения', 'error');
+                                chatSendBtn.disabled = false;
+                                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                            }
+                        });
+                }
+                
+                // Начинаем с первой коллекции
+                trySendToCollection(collectionsToTry[0], 0);
             }
 
             // Функция показа уведомления
@@ -1808,7 +1825,7 @@
                 loadMessages();
             }
             
-            // Функции для работы с сообщениями
+            // 🔥 ИСПРАВЛЕННАЯ ЗАГРУЗКА СООБЩЕНИЙ
             function loadMessages() {
                 if (!selectedUser || !currentUser) return;
                 
@@ -1821,23 +1838,44 @@
                 // Отписываемся от предыдущего слушателя
                 if (messagesUnsubscribe) messagesUnsubscribe();
                 
-                // Слушаем сообщения в реальном времени
-                messagesUnsubscribe = db.collection('privateMessages')
-                    .where('chatId', '==', chatId)
-                    .orderBy('timestamp', 'asc')
-                    .onSnapshot((snapshot) => {
-                        snapshot.docChanges().forEach(change => {
-                            if (change.type === 'added') {
-                                const message = change.doc.data();
-                                displayMessage(message);
+                // ПРОБУЕМ РАЗНЫЕ КОЛЛЕКЦИИ
+                const collectionsToTry = ['messages', 'privateMessages', 'chats'];
+                let currentCollectionIndex = 0;
+                
+                function tryLoadFromCollection(collectionName) {
+                    console.log('🔄 Пробуем загрузить из коллекции:', collectionName);
+                    
+                    messagesUnsubscribe = db.collection(collectionName)
+                        .where('chatId', '==', chatId)
+                        .orderBy('timestamp', 'asc')
+                        .onSnapshot((snapshot) => {
+                            console.log('✅ Успешно подключились к коллекции:', collectionName);
+                            
+                            snapshot.docChanges().forEach(change => {
+                                if (change.type === 'added') {
+                                    const message = change.doc.data();
+                                    displayMessage(message);
+                                }
+                            });
+                            
+                            // Прокручиваем вниз
+                            scrollToBottom();
+                        }, error => {
+                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
+                            
+                            // Пробуем следующую коллекцию
+                            currentCollectionIndex++;
+                            if (currentCollectionIndex < collectionsToTry.length) {
+                                tryLoadFromCollection(collectionsToTry[currentCollectionIndex]);
+                            } else {
+                                console.error('Все коллекции недоступны');
+                                showNotification('Ошибка загрузки сообщений', 'error');
                             }
                         });
-                        
-                        // Прокручиваем вниз
-                        scrollToBottom();
-                    }, error => {
-                        console.error('Ошибка загрузки сообщений:', error);
-                    });
+                }
+                
+                // Начинаем с первой коллекции
+                tryLoadFromCollection(collectionsToTry[0]);
             }
             
             function displayMessage(message) {
@@ -1869,6 +1907,7 @@
                 chatMessages.appendChild(messageDiv);
             }
             
+            // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
             function sendMessage() {
                 const text = chatInput.value.trim();
                 
@@ -1889,19 +1928,41 @@
                 chatSendBtn.disabled = true;
                 chatSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 
-                db.collection('privateMessages').add(message)
-                    .then(() => {
-                        chatInput.value = '';
-                        chatSendBtn.disabled = true;
-                    })
-                    .catch(error => {
-                        console.error('Ошибка отправки сообщения:', error);
-                        showNotification('Ошибка отправки сообщения', 'error');
-                    })
-                    .finally(() => {
-                        chatSendBtn.disabled = true;
-                        chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                    });
+                // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
+                const collectionsToTry = ['messages', 'privateMessages', 'chats'];
+                
+                function trySendToCollection(collectionName, index) {
+                    db.collection(collectionName).add(message)
+                        .then(() => {
+                            console.log('✅ Сообщение отправлено в коллекцию:', collectionName);
+                            chatInput.value = '';
+                            chatSendBtn.disabled = true;
+                            showNotification('Сообщение отправлено!', 'success');
+                            
+                            // 🔥 ВОССТАНАВЛИВАЕМ КНОПКУ ПРАВИЛЬНО
+                            setTimeout(() => {
+                                chatSendBtn.disabled = true;
+                                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                            }, 100);
+                        })
+                        .catch(error => {
+                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
+                            
+                            // Пробуем следующую коллекцию
+                            if (index + 1 < collectionsToTry.length) {
+                                trySendToCollection(collectionsToTry[index + 1], index + 1);
+                            } else {
+                                // Все коллекции провалились
+                                console.error('Все коллекции недоступны');
+                                showNotification('Ошибка отправки сообщения', 'error');
+                                chatSendBtn.disabled = false;
+                                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                            }
+                        });
+                }
+                
+                // Начинаем с первой коллекции
+                trySendToCollection(collectionsToTry[0], 0);
             }
             
             function addReactionToMessage(messageId, emoji) {
