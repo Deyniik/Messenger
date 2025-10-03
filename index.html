@@ -70,11 +70,24 @@
                     uid: user.uid,
                     displayName: user.displayName,
                     online: true,
-                    lastSeen: new Date()
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 
                 loadUsers();
-                setInterval(keepOnline, 20000);
+                
+                // Пинг каждые 5 секунд
+                setInterval(() => {
+                    if (currentUser) {
+                        db.collection('messengerUsers').doc(currentUser.uid).update({
+                            lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                            online: true
+                        });
+                    }
+                }, 5000);
+                
+                // Очистка оффлайн пользователей каждые 10 секунд
+                setInterval(cleanupOfflineUsers, 10000);
+                
             } else {
                 currentUser = null;
                 document.getElementById('auth').style.display = 'block';
@@ -91,19 +104,29 @@
             if (currentUser) {
                 db.collection('messengerUsers').doc(currentUser.uid).update({
                     online: false,
-                    lastSeen: new Date()
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
             auth.signOut();
         }
 
-        function keepOnline() {
-            if (currentUser) {
-                db.collection('messengerUsers').doc(currentUser.uid).update({
-                    lastSeen: new Date(),
-                    online: true
+        // Очистка оффлайн пользователей
+        function cleanupOfflineUsers() {
+            if (!currentUser) return;
+            
+            const offlineTime = new Date(Date.now() - 15000); // 15 секунд назад
+            
+            db.collection('messengerUsers')
+                .where('online', '==', true)
+                .where('lastSeen', '<', offlineTime)
+                .get()
+                .then(snapshot => {
+                    snapshot.forEach(doc => {
+                        db.collection('messengerUsers').doc(doc.id).update({
+                            online: false
+                        });
+                    });
                 });
-            }
         }
 
         // Пользователи
@@ -141,6 +164,7 @@
             selectedUser = user;
             document.getElementById('msgInput').disabled = false;
             document.getElementById('sendBtn').disabled = false;
+            document.getElementById('msgInput').placeholder = `Сообщение для ${user.displayName}...`;
             loadMessages();
         }
 
@@ -187,7 +211,7 @@
                 senderId: currentUser.uid,
                 senderName: currentUser.displayName,
                 text: text,
-                timestamp: new Date()
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
             
             input.value = '';
@@ -195,6 +219,16 @@
 
         document.getElementById('msgInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') sendMsg();
+        });
+
+        // При закрытии страницы ставим оффлайн
+        window.addEventListener('beforeunload', function() {
+            if (currentUser) {
+                db.collection('messengerUsers').doc(currentUser.uid).update({
+                    online: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
         });
     </script>
 </body>
