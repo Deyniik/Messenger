@@ -1,58 +1,18 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deynik Messenger</title>
+    <title>Test Messenger</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <style>
-        body { margin: 0; padding: 20px; background: #121212; color: white; font-family: Arial; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .btn { background: #1DB954; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
-        .user-list { background: #191414; padding: 15px; margin: 10px 0; border-radius: 8px; }
-        .user-item { padding: 10px; margin: 5px 0; background: #333; border-radius: 5px; cursor: pointer; }
-        .user-item:hover { background: #444; }
-        .chat { background: #191414; padding: 15px; margin: 10px 0; border-radius: 8px; height: 400px; overflow-y: auto; }
-        .message { margin: 10px 0; padding: 10px; border-radius: 8px; }
-        .own { background: #1DB954; margin-left: 50px; }
-        .other { background: #333; margin-right: 50px; }
-        .input-area { display: flex; margin-top: 10px; }
-        .input-area input { flex: 1; padding: 10px; border-radius: 5px; border: none; margin-right: 10px; }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>💬 Deynik Messenger</h1>
-        
-        <div id="auth-section">
-            <button class="btn" onclick="login()">Войти через Google</button>
-        </div>
-
-        <div id="app" style="display: none;">
-            <div class="user-list">
-                <h3>👥 Пользователи онлайн: <span id="online-count">0</span></h3>
-                <div id="users-list"></div>
-            </div>
-
-            <div class="chat" id="chat-messages">
-                <div style="text-align: center; color: #666; margin-top: 50px;">
-                    Выберите пользователя для общения
-                </div>
-            </div>
-
-            <div class="input-area">
-                <input type="text" id="message-input" placeholder="Введите сообщение..." disabled>
-                <button class="btn" id="send-btn" disabled onclick="sendMessage()">Отправить</button>
-            </div>
-
-            <button class="btn" onclick="logout()" style="background: #666; margin-top: 10px;">Выйти</button>
-        </div>
-    </div>
+    <button onclick="login()">Войти</button>
+    <button onclick="testWrite()">Тест записи</button>
+    <button onclick="testRead()">Тест чтения</button>
+    <div id="log"></div>
 
     <script>
-        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyBk4nxZ1ldNQUCxsbgaeYTkm9stq0o9o2Q",
             authDomain: "deygram-e4814.firebaseapp.com",
@@ -66,146 +26,55 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentUser = null;
-        let selectedUser = null;
-
-        // Auth state listener
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('auth-section').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                
-                // Update user status
-                db.collection('messengerUsers').doc(user.uid).set({
-                    uid: user.uid,
-                    displayName: user.displayName,
-                    online: true,
-                    lastSeen: new Date()
-                }, { merge: true });
-                
-                loadUsers();
-            } else {
-                currentUser = null;
-                document.getElementById('auth-section').style.display = 'block';
-                document.getElementById('app').style.display = 'none';
-            }
-        });
+        function log(msg) {
+            document.getElementById('log').innerHTML += msg + '<br>';
+            console.log(msg);
+        }
 
         function login() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider);
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    log('✅ Вошел как: ' + result.user.displayName);
+                })
+                .catch(error => {
+                    log('❌ Ошибка входа: ' + error.message);
+                });
         }
 
-        function logout() {
-            if (currentUser) {
-                db.collection('messengerUsers').doc(currentUser.uid).update({
-                    online: false,
-                    lastSeen: new Date()
-                });
+        function testWrite() {
+            if (!auth.currentUser) {
+                log('❌ Сначала войди!');
+                return;
             }
-            auth.signOut();
-        }
 
-        function loadUsers() {
-            db.collection('messengerUsers')
-                .where('online', '==', true)
-                .onSnapshot(snapshot => {
-                    const usersList = document.getElementById('users-list');
-                    const onlineCount = document.getElementById('online-count');
-                    let count = 0;
-                    
-                    usersList.innerHTML = '';
-                    
-                    snapshot.forEach(doc => {
-                        const user = doc.data();
-                        if (user.uid !== currentUser.uid) {
-                            count++;
-                            const userDiv = document.createElement('div');
-                            userDiv.className = 'user-item';
-                            userDiv.textContent = user.displayName;
-                            userDiv.onclick = () => selectUser(user);
-                            usersList.appendChild(userDiv);
-                        }
-                    });
-                    
-                    onlineCount.textContent = count;
-                    
-                    if (count === 0) {
-                        usersList.innerHTML = '<div style="color: #666; text-align: center;">Нет пользователей онлайн</div>';
-                    }
-                });
-        }
-
-        function selectUser(user) {
-            selectedUser = user;
-            document.getElementById('message-input').disabled = false;
-            document.getElementById('send-btn').disabled = false;
-            document.getElementById('message-input').placeholder = `Сообщение для ${user.displayName}...`;
-            loadMessages();
-        }
-
-        function loadMessages() {
-            if (!selectedUser) return;
-            
-            const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-            const chatMessages = document.getElementById('chat-messages');
-            
-            chatMessages.innerHTML = '';
-            
-            db.collection('privateMessages')
-                .where('chatId', '==', chatId)
-                .orderBy('timestamp', 'asc')
-                .onSnapshot(snapshot => {
-                    chatMessages.innerHTML = '';
-                    
-                    snapshot.forEach(doc => {
-                        const msg = doc.data();
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = `message ${msg.senderId === currentUser.uid ? 'own' : 'other'}`;
-                        msgDiv.innerHTML = `
-                            <strong>${msg.senderName}:</strong> ${msg.text}
-                            <div style="font-size: 0.8em; opacity: 0.7;">${new Date(msg.timestamp?.toDate()).toLocaleTimeString()}</div>
-                        `;
-                        chatMessages.appendChild(msgDiv);
-                    });
-                    
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                });
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-            
-            if (!text || !selectedUser) return;
-            
-            const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-            
-            db.collection('privateMessages').add({
-                chatId: chatId,
-                senderId: currentUser.uid,
-                senderName: currentUser.displayName,
-                text: text,
+            db.collection('testUsers').doc(auth.currentUser.uid).set({
+                name: auth.currentUser.displayName,
+                online: true,
                 timestamp: new Date()
-            });
-            
-            input.value = '';
+            })
+            .then(() => log('✅ Запись успешна!'))
+            .catch(error => log('❌ Ошибка записи: ' + error.message));
         }
 
-        // Enter to send
-        document.getElementById('message-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
-        });
+        function testRead() {
+            db.collection('testUsers').get()
+                .then(snapshot => {
+                    log('📖 Найдено пользователей: ' + snapshot.size);
+                    snapshot.forEach(doc => {
+                        log('👤 ' + doc.data().name + ' - ' + doc.data().online);
+                    });
+                })
+                .catch(error => log('❌ Ошибка чтения: ' + error.message));
+        }
 
-        // Keep alive
-        setInterval(() => {
-            if (currentUser) {
-                db.collection('messengerUsers').doc(currentUser.uid).update({
-                    lastSeen: new Date()
-                });
+        // Авто-тест при загрузке
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                log('🔑 Авторизован: ' + user.displayName);
+                testRead();
             }
-        }, 30000);
+        });
     </script>
 </body>
 </html>
