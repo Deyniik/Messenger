@@ -1,47 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Deynik Messenger</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deynik Messenger - Online Test</title>
     <style>
-        body { margin: 20px; background: #121212; color: white; font-family: Arial; }
-        .btn { background: #1DB954; color: white; border: none; padding: 10px; margin: 5px; border-radius: 5px; cursor: pointer; }
-        .users { background: #191414; padding: 15px; margin: 10px 0; border-radius: 8px; }
-        .user { padding: 10px; margin: 5px 0; background: #333; border-radius: 5px; cursor: pointer; }
-        .chat { background: #191414; padding: 15px; margin: 10px 0; border-radius: 8px; height: 300px; overflow-y: auto; }
-        .msg { margin: 10px 0; padding: 10px; border-radius: 8px; }
-        .own { background: #1DB954; margin-left: 50px; }
-        .other { background: #333; margin-right: 50px; }
-        .input { display: flex; margin-top: 10px; }
-        .input input { flex: 1; padding: 10px; border-radius: 5px; border: none; margin-right: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1DB954;
+            margin-bottom: 20px;
+        }
+        
+        .auth-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-btn {
+            background: #1DB954;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .user-profile {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .users-list {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .user-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #333;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1DB954;
+        }
+        
+        .offline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+        
+        .status-text {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .logout-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>💬 Deynik Messenger</h1>
-    
-    <div id="auth">
-        <button class="btn" onclick="login()">Войти через Google</button>
+    <div class="container">
+        <h1>💬 Deynik Messenger - Online Test</h1>
+        
+        <div class="auth-section" id="auth-section">
+            <button class="login-btn" id="loginBtn">
+                🔐 Войти через Google
+            </button>
+        </div>
+        
+        <div class="users-list">
+            <h3>👥 Пользователи онлайн:</h3>
+            <div id="usersList">
+                <!-- Список пользователей -->
+            </div>
+        </div>
     </div>
 
-    <div id="app" style="display:none">
-        <div class="users">
-            <h3>👥 Онлайн: <span id="onlineCount">0</span></h3>
-            <div id="usersList"></div>
-        </div>
-
-        <div class="chat" id="chat"></div>
-
-        <div class="input">
-            <input type="text" id="msgInput" placeholder="Сообщение..." disabled>
-            <button class="btn" id="sendBtn" disabled onclick="sendMsg()">Отправить</button>
-        </div>
-
-        <button class="btn" onclick="logout()" style="background:#666">Выйти</button>
-    </div>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
+        // Конфиг Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBk4nxZ1ldNQUCxsbgaeYTkm9stq0o9o2Q",
             authDomain: "deygram-e4814.firebaseapp.com",
@@ -51,185 +138,163 @@
             appId: "1:591207353726:web:d20f5e648d3daf86fcb72f"
         };
 
+        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
         let currentUser = null;
-        let selectedUser = null;
+        let onlineCheckInterval;
+        let usersListener;
 
-        // Авторизация
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('auth').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                
-                // Статус онлайн
-                db.collection('messengerUsers').doc(user.uid).set({
-                    uid: user.uid,
-                    displayName: user.displayName,
-                    online: true,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                
-                loadUsers();
-                
-                // Пинг каждые 5 секунд
-                setInterval(() => {
-                    if (currentUser) {
-                        db.collection('messengerUsers').doc(currentUser.uid).update({
-                            lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true
-                        });
-                    }
-                }, 5000);
-                
-                // Очистка оффлайн пользователей каждые 10 секунд
-                setInterval(cleanupOfflineUsers, 10000);
-                
-            } else {
-                currentUser = null;
-                document.getElementById('auth').style.display = 'block';
-                document.getElementById('app').style.display = 'none';
-            }
-        });
-
-        function login() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider);
+        // Проверка онлайн статуса каждые 3 секунды
+        function startOnlinePing() {
+            if (onlineCheckInterval) clearInterval(onlineCheckInterval);
+            
+            onlineCheckInterval = setInterval(() => {
+                if (currentUser) {
+                    db.collection('onlineUsers').doc(currentUser.uid).set({
+                        uid: currentUser.uid,
+                        displayName: currentUser.displayName || 'Аноним',
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                        online: true
+                    });
+                }
+            }, 3000);
         }
 
-        function logout() {
-            if (currentUser) {
-                db.collection('messengerUsers').doc(currentUser.uid).update({
-                    online: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-            auth.signOut();
-        }
-
-        // Очистка оффлайн пользователей
-        function cleanupOfflineUsers() {
-            if (!currentUser) return;
-            
-            const offlineTime = new Date(Date.now() - 15000); // 15 секунд назад
-            
-            db.collection('messengerUsers')
-                .where('online', '==', true)
-                .where('lastSeen', '<', offlineTime)
-                .get()
-                .then(snapshot => {
-                    snapshot.forEach(doc => {
-                        db.collection('messengerUsers').doc(doc.id).update({
-                            online: false
+        // Очистка неактивных пользователей
+        function startCleanup() {
+            setInterval(() => {
+                const cutoff = new Date(Date.now() - 10000); // 10 секунд
+                db.collection('onlineUsers')
+                    .where('lastSeen', '<', cutoff)
+                    .get()
+                    .then(snapshot => {
+                        snapshot.forEach(doc => {
+                            doc.ref.delete(); // Удаляем неактивных
                         });
                     });
-                });
+            }, 5000);
         }
 
-        // Пользователи
-        function loadUsers() {
-            db.collection('messengerUsers')
-                .where('online', '==', true)
+        // Слушаем онлайн пользователей
+        function listenToOnlineUsers() {
+            if (usersListener) usersListener(); // Отписываемся от старого слушателя
+            
+            usersListener = db.collection('onlineUsers')
                 .onSnapshot(snapshot => {
                     const usersList = document.getElementById('usersList');
-                    const onlineCount = document.getElementById('onlineCount');
-                    let count = 0;
-                    
                     usersList.innerHTML = '';
                     
                     snapshot.forEach(doc => {
                         const user = doc.data();
                         if (user.uid !== currentUser.uid) {
-                            count++;
-                            const userDiv = document.createElement('div');
-                            userDiv.className = 'user';
-                            userDiv.textContent = user.displayName;
-                            userDiv.onclick = () => selectUser(user);
-                            usersList.appendChild(userDiv);
+                            const userElement = document.createElement('div');
+                            userElement.className = 'user-item';
+                            userElement.innerHTML = `
+                                <div>${user.displayName}</div>
+                                <div class="online-status">
+                                    <div class="online-dot"></div>
+                                    <span>online</span>
+                                </div>
+                            `;
+                            usersList.appendChild(userElement);
                         }
                     });
                     
-                    onlineCount.textContent = count;
-                    
-                    if (count === 0) {
-                        usersList.innerHTML = '<div style="color:#666; text-align:center">Нет пользователей онлайн</div>';
+                    // Показываем количество онлайн
+                    const onlineCount = snapshot.size - (currentUser ? 1 : 0);
+                    if (onlineCount === 0) {
+                        usersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Нет пользователей онлайн</div>';
                     }
                 });
         }
 
-        function selectUser(user) {
-            selectedUser = user;
-            document.getElementById('msgInput').disabled = false;
-            document.getElementById('sendBtn').disabled = false;
-            document.getElementById('msgInput').placeholder = `Сообщение для ${user.displayName}...`;
-            loadMessages();
-        }
-
-        // Сообщения
-        function loadMessages() {
-            if (!selectedUser) return;
-            
-            const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-            const chat = document.getElementById('chat');
-            
-            db.collection('privateMessages')
-                .where('chatId', '==', chatId)
-                .orderBy('timestamp', 'asc')
-                .onSnapshot(snapshot => {
-                    chat.innerHTML = '';
-                    
-                    if (snapshot.empty) {
-                        chat.innerHTML = '<div style="color:#666; text-align:center">Нет сообщений</div>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(doc => {
-                        const msg = doc.data();
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = `msg ${msg.senderId === currentUser.uid ? 'own' : 'other'}`;
-                        msgDiv.innerHTML = `<strong>${msg.senderName}:</strong> ${msg.text}`;
-                        chat.appendChild(msgDiv);
-                    });
-                    
-                    chat.scrollTop = chat.scrollHeight;
+        // Вход через Google
+        function login() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    currentUser = result.user;
+                    updateUI();
+                    startOnlinePing();
+                    listenToOnlineUsers();
+                })
+                .catch(error => {
+                    console.error('Ошибка входа:', error);
+                    alert('Ошибка входа: ' + error.message);
                 });
         }
 
-        function sendMsg() {
-            const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            
-            if (!text || !selectedUser) return;
-            
-            const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-            
-            db.collection('privateMessages').add({
-                chatId: chatId,
-                senderId: currentUser.uid,
-                senderName: currentUser.displayName,
-                text: text,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            input.value = '';
-        }
-
-        document.getElementById('msgInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMsg();
-        });
-
-        // При закрытии страницы ставим оффлайн
-        window.addEventListener('beforeunload', function() {
+        // Выход
+        function logout() {
             if (currentUser) {
-                db.collection('messengerUsers').doc(currentUser.uid).update({
-                    online: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                // Удаляем из онлайн пользователей
+                db.collection('onlineUsers').doc(currentUser.uid).delete();
+            }
+            
+            if (onlineCheckInterval) clearInterval(onlineCheckInterval);
+            if (usersListener) usersListener();
+            
+            auth.signOut();
+            currentUser = null;
+            updateUI();
+        }
+
+        // Обновление интерфейса
+        function updateUI() {
+            const authSection = document.getElementById('auth-section');
+            
+            if (currentUser) {
+                authSection.innerHTML = `
+                    <div class="user-profile">
+                        <h3>👋 Привет, ${currentUser.displayName}!</h3>
+                        <p>Твой статус: <span style="color: #1DB954;">● онлайн</span></p>
+                        <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+                    </div>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <button class="login-btn" id="loginBtn">
+                        🔐 Войти через Google
+                    </button>
+                `;
+                document.getElementById('loginBtn').onclick = login;
+            }
+        }
+
+        // Обработчик закрытия страницы
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                // Пытаемся отправить запрос перед закрытием
+                navigator.sendBeacon = navigator.sendBeacon || function() { return false; };
+                
+                // Удаляем пользователя из онлайн
+                const url = `https://firestore.googleapis.com/v1/projects/deygram-e4814/databases/(default)/documents/onlineUsers/${currentUser.uid}`;
+                const blob = new Blob([], { type: 'application/json' });
+                navigator.sendBeacon(url, blob);
             }
         });
+
+        // Инициализация при загрузке
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            updateUI();
+            
+            if (user) {
+                startOnlinePing();
+                startCleanup();
+                listenToOnlineUsers();
+            } else {
+                if (onlineCheckInterval) clearInterval(onlineCheckInterval);
+                if (usersListener) usersListener();
+                document.getElementById('usersList').innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Войдите чтобы видеть онлайн пользователей</div>';
+            }
+        });
+
+        // Запускаем очистку при загрузке
+        startCleanup();
     </script>
 </body>
 </html>
