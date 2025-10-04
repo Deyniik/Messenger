@@ -6,7 +6,6 @@
     <title>Deynik Messenger</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -29,40 +28,6 @@
             flex-direction: column;
             padding: 12px;
             overflow: hidden;
-            position: relative;
-        }
-        
-        /* Ретро-эффект линий */
-        .vintage-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.3;
-        }
-        
-        .crt-effect {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .crt-effect::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 3px;
-            z-index: 2;
-            pointer-events: none;
-            opacity: 0.1;
         }
         
         .container {
@@ -123,7 +88,6 @@
         
         .google-login-btn:hover {
             background: rgba(29, 185, 84, 0.3);
-            transform: scale(1.05);
         }
         
         h1 {
@@ -131,7 +95,6 @@
             color: #1DB954;
             text-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
             letter-spacing: 2px;
-            font-family: 'Dancing Script', cursive;
         }
         
         .back-to-radio {
@@ -151,7 +114,6 @@
         
         .back-to-radio:hover {
             background: rgba(29, 185, 84, 0.3);
-            transform: scale(1.05);
         }
         
         .content {
@@ -172,7 +134,6 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             min-width: 250px;
             overflow: hidden;
         }
@@ -194,21 +155,6 @@
             overflow-y: auto;
             padding-right: 5px;
             margin-bottom: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(29, 185, 84, 0.3) #191414;
-        }
-        
-        .users-list::-webkit-scrollbar {
-            width: 5px;
-        }
-        
-        .users-list::-webkit-scrollbar-track {
-            background: #191414;
-        }
-        
-        .users-list::-webkit-scrollbar-thumb {
-            background-color: rgba(29, 185, 84, 0.3);
-            border-radius: 5px;
         }
         
         .user-item {
@@ -227,12 +173,10 @@
         
         .user-item:hover {
             background: rgba(29, 185, 84, 0.2);
-            transform: translateX(-3px);
         }
         
         .user-item.active {
             background: rgba(29, 185, 84, 0.3);
-            box-shadow: 0 0 10px rgba(29, 185, 84, 0.3);
         }
         
         .user-status {
@@ -264,7 +208,6 @@
             border-radius: 12px;
             padding: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
         
@@ -285,21 +228,6 @@
             display: flex;
             flex-direction: column;
             padding: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(29, 185, 84, 0.3) #191414;
-        }
-        
-        .chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-track {
-            background: #191414;
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb {
-            background-color: rgba(29, 185, 84, 0.3);
-            border-radius: 2px;
         }
         
         .message {
@@ -311,7 +239,6 @@
             line-height: 1.4;
             word-wrap: break-word;
             max-width: 80%;
-            transition: all 0.2s ease;
         }
         
         .message.own {
@@ -324,14 +251,6 @@
             align-self: flex-start;
             background: rgba(40, 40, 40, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .message:hover {
-            background: rgba(40, 40, 40, 0.8);
-        }
-        
-        .message.own:hover {
-            background: rgba(29, 185, 84, 0.3);
         }
         
         .message-user {
@@ -348,12 +267,10 @@
             float: right;
         }
         
-        /* ОБНОВЛЕННЫЙ ЧАТ С КНОПКОЙ ЭМОДЗИ И ГИФОК */
         .chat-input-container {
             display: flex;
             gap: 10px;
             margin-top: auto;
-            position: relative;
         }
         
         .chat-input {
@@ -361,7 +278,7 @@
             background: rgba(40, 40, 40, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 12px 15px 12px 80px;
+            padding: 12px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
             outline: none;
@@ -370,38 +287,6 @@
         
         .chat-input:focus {
             border-color: #1DB954;
-        }
-        
-        .emoji-btn, .gif-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: #B3B3B3;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            z-index: 2;
-        }
-        
-        .emoji-btn {
-            left: 12px;
-        }
-        
-        .gif-btn {
-            left: 47px;
-        }
-        
-        .emoji-btn:hover, .gif-btn:hover {
-            background: rgba(29, 185, 84, 0.2);
-            color: #1DB954;
         }
         
         .chat-send-btn {
@@ -421,212 +306,11 @@
         
         .chat-send-btn:hover:not(:disabled) {
             background: rgba(29, 185, 84, 0.5);
-            transform: scale(1.05);
         }
         
         .chat-send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-        
-        /* ОКНО ЭМОДЗИ */
-        .emoji-picker {
-            position: absolute;
-            bottom: 55px;
-            left: 0;
-            background: rgba(40, 40, 40, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 12px;
-            width: 300px;
-            z-index: 100;
-            display: none;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-        }
-        
-        .emoji-picker.show {
-            display: block;
-            animation: fadeIn 0.2s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .emoji-search {
-            width: 100%;
-            background: rgba(60, 60, 60, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            outline: none;
-            margin-bottom: 10px;
-        }
-        
-        .emoji-search:focus {
-            border-color: #1DB954;
-        }
-        
-        .emoji-categories {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 5px;
-        }
-        
-        .emoji-category {
-            background: transparent;
-            border: none;
-            color: #B3B3B3;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 5px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        
-        .emoji-category:hover, .emoji-category.active {
-            background: rgba(29, 185, 84, 0.2);
-            color: #1DB954;
-        }
-        
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(29, 185, 84, 0.3) #191414;
-        }
-        
-        .emoji-grid::-webkit-scrollbar {
-            width: 4px;
-        }
-        
-        .emoji-grid::-webkit-scrollbar-track {
-            background: #191414;
-        }
-        
-        .emoji-grid::-webkit-scrollbar-thumb {
-            background-color: rgba(29, 185, 84, 0.3);
-            border-radius: 2px;
-        }
-        
-        .emoji-item {
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        
-        .emoji-item:hover {
-            background: rgba(29, 185, 84, 0.2);
-            transform: scale(1.1);
-        }
-        
-        /* Окно поиска GIF */
-        .gif-picker {
-            position: absolute;
-            bottom: 55px;
-            left: 0;
-            background: rgba(40, 40, 40, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px;
-            width: 300px;
-            height: 350px;
-            display: none;
-            flex-direction: column;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .gif-picker.show {
-            display: flex;
-        }
-        
-        .gif-search {
-            width: 100%;
-            background: rgba(60, 60, 60, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            outline: none;
-            margin-bottom: 10px;
-        }
-        
-        .gif-search:focus {
-            border-color: #1DB954;
-        }
-        
-        .gif-trending {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .gif-trending-btn {
-            background: rgba(60, 60, 60, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #B3B3B3;
-            padding: 4px 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: all 0.2s ease;
-        }
-        
-        .gif-trending-btn:hover {
-            background: rgba(29, 185, 84, 0.2);
-            color: white;
-        }
-        
-        .gif-results {
-            flex: 1;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(29, 185, 84, 0.3) #191414;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
-        }
-        
-        .gif-results::-webkit-scrollbar {
-            width: 4px;
-        }
-        
-        .gif-results::-webkit-scrollbar-track {
-            background: #191414;
-        }
-        
-        .gif-results::-webkit-scrollbar-thumb {
-            background-color: rgba(29, 185, 84, 0.3);
-            border-radius: 2px;
-        }
-        
-        .gif-item {
-            width: 100%;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .gif-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 8px rgba(29, 185, 84, 0.5);
         }
         
         .no-chat-selected {
@@ -667,37 +351,13 @@
         .notification.error {
             background: #e74c3c;
         }
-        
-        @media (max-width: 900px) {
-            .content {
-                flex-direction: column;
-            }
-            
-            .side-panel {
-                width: 100%;
-                height: 200px;
-                margin-bottom: 12px;
-            }
-            
-            .chat-container {
-                width: 100%;
-                height: 400px;
-            }
-            
-            .emoji-picker, .gif-picker {
-                width: 250px;
-                left: -50px;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="vintage-overlay"></div>
-    
     <div class="container" id="mainContainer">
         <header>
             <div class="header-left">
-                <a href="https://deyniik.github.io/DeynikRadio/" class="back-to-radio crt-effect">
+                <a href="https://deyniik.github.io/DeynikRadio/" class="back-to-radio">
                     <i class="fas fa-arrow-left"></i> Назад к радио
                 </a>
             </div>
@@ -708,7 +368,7 @@
             
             <div class="header-right">
                 <div id="auth-section">
-                    <button class="google-login-btn crt-effect">
+                    <button class="google-login-btn" id="googleLoginBtn">
                         <i class="fab fa-google"></i> Войти через Google
                     </button>
                 </div>
@@ -716,7 +376,7 @@
         </header>
         
         <div class="content">
-            <div class="side-panel crt-effect">
+            <div class="side-panel">
                 <div class="users-header">
                     <h3>Пользователи онлайн</h3>
                     <span class="online-count" id="onlineCount">0</span>
@@ -731,7 +391,7 @@
                 </ul>
             </div>
             
-            <div class="chat-container crt-effect">
+            <div class="chat-container">
                 <div class="chat-header">
                     <i class="fas fa-comments"></i>
                     <h3 id="currentChatUser">Общий чат</h3>
@@ -746,43 +406,10 @@
                 </div>
                 
                 <div class="chat-input-container">
-                    <button class="emoji-btn" id="emoji-btn">
-                        <i class="far fa-smile"></i>
-                    </button>
-                    <button class="gif-btn" id="gif-btn">
-                        GIF
-                    </button>
                     <input type="text" class="chat-input" id="chat-input" placeholder="Войдите в систему" disabled>
                     <button class="chat-send-btn" id="chat-send-btn" disabled>
                         <i class="fas fa-paper-plane"></i>
                     </button>
-                    
-                    <!-- ОКНО ЭМОДЗИ -->
-                    <div class="emoji-picker" id="emoji-picker">
-                        <input type="text" class="emoji-search" id="emoji-search" placeholder="Поиск эмодзи...">
-                        <div class="emoji-categories">
-                            <button class="emoji-category active" data-category="smileys">😀</button>
-                            <button class="emoji-category" data-category="hearts">❤️</button>
-                            <button class="emoji-category" data-category="objects">🔔</button>
-                        </div>
-                        <div class="emoji-grid" id="emoji-grid">
-                            <!-- Эмодзи будут добавлены через JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <!-- ОКНО ПОИСКА GIF -->
-                    <div class="gif-picker" id="gif-picker">
-                        <input type="text" class="gif-search" id="gif-search" placeholder="Поиск GIF...">
-                        <div class="gif-trending">
-                            <button class="gif-trending-btn" data-term="funny">Смешные</button>
-                            <button class="gif-trending-btn" data-term="music">Музыка</button>
-                            <button class="gif-trending-btn" data-term="dance">Танцы</button>
-                            <button class="gif-trending-btn" data-term="love">Любовь</button>
-                        </div>
-                        <div class="gif-results" id="gif-results">
-                            <!-- GIF будут добавлены через JavaScript -->
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -816,136 +443,12 @@
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
         const notification = document.getElementById('notification');
-        const emojiBtn = document.getElementById('emoji-btn');
-        const gifBtn = document.getElementById('gif-btn');
-        const emojiPicker = document.getElementById('emoji-picker');
-        const gifPicker = document.getElementById('gif-picker');
-        const emojiSearch = document.getElementById('emoji-search');
-        const gifSearch = document.getElementById('gif-search');
-        const emojiGrid = document.getElementById('emoji-grid');
-        const gifResults = document.getElementById('gif-results');
-        const emojiCategoryBtns = document.querySelectorAll('.emoji-category');
-        const gifTrendingBtns = document.querySelectorAll('.gif-trending-btn');
 
         // Переменные
         let currentUser = null;
         let selectedUser = null;
         let usersUnsubscribe = null;
         let messagesUnsubscribe = null;
-
-        // Эмодзи для поиска
-        const emojiCategories = {
-            smileys: ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃"],
-            hearts: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟"],
-            objects: ["🔔", "🎵", "🎶", "🎼", "🎧", "🎤", "🎷", "🎸", "🎹", "🎺", "🎻", "🥁", "📻", "📱", "💻", "🖥️", "🖨️", "🎥", "📹", "📼", "🔍", "🔎", "💡", "📔", "📒", "📕", "📗", "📘", "📙", "📚", "📖", "🔖", "🎯", "🧩", "🚀", "⭐", "🌟", "🎁", "🎉", "🎊", "🎈", "🎂", "🍰", "🧁", "🥧", "🍦", "🍨", "🍩", "🍪", "🎀", "🎗️", "🎟️", "🎫", "🏆", "🏅", "🥇", "🥈", "🥉", "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🎿", "⛷️", "🏂", "🪂", "🏋️", "🤼", "🤸", "⛹️", "🤾", "🏌️", "🏇", "🧘"]
-        };
-
-        // Инициализация эмодзи и GIF
-        loadEmojis('smileys');
-        loadTrendingGifs();
-
-        // Загрузка эмодзи
-        function loadEmojis(category) {
-            emojiGrid.innerHTML = '';
-            emojiCategories[category].forEach(emoji => {
-                const emojiElement = document.createElement('div');
-                emojiElement.className = 'emoji-item';
-                emojiElement.textContent = emoji;
-                emojiElement.addEventListener('click', function() {
-                    insertEmoji(emoji);
-                    emojiPicker.classList.remove('show');
-                });
-                emojiGrid.appendChild(emojiElement);
-            });
-        }
-
-        // Вставка эмодзи в поле ввода
-        function insertEmoji(emoji) {
-            chatInput.value += emoji;
-            chatInput.focus();
-            chatSendBtn.disabled = chatInput.value.trim() === '';
-        }
-
-        // Загрузка трендовых GIF
-        function loadTrendingGifs() {
-            const trendingGifs = [
-                'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
-                'https://media.giphy.com/media/3o7aD2d7hy9ktXNDP2/giphy.gif',
-                'https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif',
-                'https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif',
-                'https://media.giphy.com/media/3o7abGQa0aRsohveX6/giphy.gif',
-                'https://media.giphy.com/media/3o7TKM1Fa6k5g2qsxq/giphy.gif'
-            ];
-            
-            gifResults.innerHTML = '';
-            trendingGifs.forEach(gifUrl => {
-                const gifElement = document.createElement('img');
-                gifElement.className = 'gif-item';
-                gifElement.src = gifUrl;
-                gifElement.addEventListener('click', function() {
-                    sendGifMessage(gifUrl);
-                    gifPicker.classList.remove('show');
-                });
-                gifResults.appendChild(gifElement);
-            });
-        }
-
-        // Поиск GIF
-        async function searchGifs(term = null) {
-            const searchTerm = term || gifSearch.value;
-            if (!searchTerm) {
-                loadTrendingGifs();
-                return;
-            }
-            
-            // Для демонстрации используем статические GIF
-            const searchGifs = [
-                'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
-                'https://media.giphy.com/media/3o7aD2d7hy9ktXNDP2/giphy.gif',
-                'https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif'
-            ];
-            
-            gifResults.innerHTML = '';
-            
-            searchGifs.forEach(gifUrl => {
-                const gifElement = document.createElement('img');
-                gifElement.className = 'gif-item';
-                gifElement.src = gifUrl;
-                gifElement.addEventListener('click', function() {
-                    sendGifMessage(gifUrl);
-                    gifPicker.classList.remove('show');
-                });
-                gifResults.appendChild(gifElement);
-            });
-        }
-
-        // Отправка GIF сообщения
-        function sendGifMessage(gifUrl) {
-            if (!currentUser || !selectedUser) {
-                showNotification('Войдите в систему и выберите пользователя', 'error');
-                return;
-            }
-            
-            const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-            
-            const message = {
-                chatId: chatId,
-                senderId: currentUser.uid,
-                senderName: currentUser.displayName || 'Пользователь',
-                gif: gifUrl,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            db.collection('chat').add(message)
-                .then(() => {
-                    showNotification('GIF отправлен!');
-                    scrollToBottom();
-                })
-                .catch((error) => {
-                    console.error('Ошибка отправки:', error);
-                    showNotification('Ошибка отправки', 'error');
-                });
-        }
 
         // Показать уведомление
         function showNotification(message, type = 'info') {
@@ -969,7 +472,7 @@
                             ${user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
                         </div>
                         <span>${user.displayName || 'Пользователь'}</span>
-                        <button class="google-login-btn crt-effect" id="logoutBtn" style="background: #e74c3c;">
+                        <button class="google-login-btn" id="logoutBtn" style="background: #e74c3c;">
                             <i class="fas fa-sign-out-alt"></i> Выйти
                         </button>
                     </div>
@@ -985,7 +488,7 @@
             } else {
                 // Пользователь не вошел
                 authSection.innerHTML = `
-                    <button class="google-login-btn crt-effect" id="googleLoginBtn">
+                    <button class="google-login-btn" id="googleLoginBtn">
                         <i class="fab fa-google"></i> Войти через Google
                     </button>
                 `;
@@ -1104,7 +607,7 @@
             loadMessages();
         }
 
-        // Загрузка сообщений
+        // 🔥 САМАЯ ПРОСТАЯ ЗАГРУЗКА СООБЩЕНИЙ
         function loadMessages() {
             if (!selectedUser || !currentUser) return;
 
@@ -1114,6 +617,7 @@
 
             if (messagesUnsubscribe) messagesUnsubscribe();
 
+            // 🔥 ПРОСТОЙ ЗАПРОС БЕЗ УСЛОВИЙ - ЗАГРУЖАЕМ ВСЕ СООБЩЕНИЯ
             messagesUnsubscribe = db.collection('chat')
                 .orderBy('timestamp', 'asc')
                 .onSnapshot((snapshot) => {
@@ -1124,6 +628,7 @@
                     snapshot.forEach((doc) => {
                         const message = doc.data();
                         
+                        // 🔥 ФИЛЬТРУЕМ НА КЛИЕНТЕ - ПРОСТО И РАБОЧЕ
                         if (message.chatId === chatId) {
                             displayMessage(message);
                             hasMessages = true;
@@ -1159,26 +664,16 @@
                 timeString = time.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             }
 
-            let messageContent = '';
-            if (message.gif) {
-                messageContent = `
-                    <span class="message-user">${message.senderName || 'Аноним'}:</span>
-                    <img src="${message.gif}" style="max-width: 200px; border-radius: 8px; margin-top: 5px; display: block;" alt="GIF">
-                    <span class="message-time">${timeString}</span>
-                `;
-            } else {
-                messageContent = `
-                    <span class="message-user">${message.senderName || 'Аноним'}:</span>
-                    ${message.text || ''}
-                    <span class="message-time">${timeString}</span>
-                `;
-            }
+            messageDiv.innerHTML = `
+                <span class="message-user">${message.senderName || 'Аноним'}:</span>
+                ${message.text || ''}
+                <span class="message-time">${timeString}</span>
+            `;
 
-            messageDiv.innerHTML = messageContent;
             chatMessages.appendChild(messageDiv);
         }
 
-        // Отправка сообщений
+        // 🔥 САМАЯ ПРОСТАЯ ОТПРАВКА СООБЩЕНИЙ
         function sendMessage() {
             const text = chatInput.value.trim();
             if (!text || !selectedUser || !currentUser) return;
@@ -1193,10 +688,10 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
+            // 🔥 ПРОСТО СОХРАНЯЕМ В COLLECTION 'chat'
             db.collection('chat').add(message)
                 .then(() => {
                     chatInput.value = '';
-                    chatSendBtn.disabled = true;
                     showNotification('Сообщение отправлено!');
                     scrollToBottom();
                 })
@@ -1234,97 +729,7 @@
             }
         });
 
-        chatInput.addEventListener('input', function() {
-            if (currentUser && selectedUser) {
-                chatSendBtn.disabled = this.value.trim() === '';
-            }
-        });
-
         chatSendBtn.addEventListener('click', sendMessage);
-
-        // КНОПКА ЭМОДЗИ
-        emojiBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (!currentUser) {
-                showNotification('Войдите в систему', 'error');
-                return;
-            }
-            emojiPicker.classList.toggle('show');
-            gifPicker.classList.remove('show');
-        });
-
-        // КНОПКА GIF
-        gifBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (!currentUser) {
-                showNotification('Войдите в систему', 'error');
-                return;
-            }
-            gifPicker.classList.toggle('show');
-            emojiPicker.classList.remove('show');
-        });
-
-        // Поиск эмодзи
-        emojiSearch.addEventListener('input', function(e) {
-            e.stopPropagation();
-            const searchTerm = emojiSearch.value.toLowerCase();
-            const currentCategory = document.querySelector('.emoji-category.active').dataset.category;
-            const emojis = emojiCategories[currentCategory];
-            
-            emojiGrid.innerHTML = '';
-            
-            emojis.forEach(emoji => {
-                if (searchTerm === '' || emoji.includes(searchTerm)) {
-                    const emojiElement = document.createElement('div');
-                    emojiElement.className = 'emoji-item';
-                    emojiElement.textContent = emoji;
-                    emojiElement.addEventListener('click', function() {
-                        insertEmoji(emoji);
-                        emojiPicker.classList.remove('show');
-                    });
-                    emojiGrid.appendChild(emojiElement);
-                }
-            });
-        });
-
-        // Категории эмодзи
-        emojiCategoryBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                emojiCategoryBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                loadEmojis(this.dataset.category);
-            });
-        });
-
-        // Поиск GIF
-        gifSearch.addEventListener('input', function(e) {
-            e.stopPropagation();
-            searchGifs();
-        });
-
-        // Трендовые GIF
-        gifTrendingBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                searchGifs(this.dataset.term);
-            });
-        });
-
-        // Закрытие окон при клике вне их
-        document.addEventListener('click', function() {
-            emojiPicker.classList.remove('show');
-            gifPicker.classList.remove('show');
-        });
-
-        // Предотвращение закрытия окон при клике внутри них
-        emojiPicker.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-
-        gifPicker.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
 
         // Слушатель аутентификации
         auth.onAuthStateChanged((user) => {
@@ -1341,7 +746,7 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('googleLoginBtn').addEventListener('click', signInWithGoogle);
+            googleLoginBtn.addEventListener('click', signInWithGoogle);
         });
     </script>
 </body>
