@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deynik Messenger</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/6.4.0/css/all.min.css">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -169,6 +169,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         }
         
         .user-item:hover {
@@ -183,12 +184,17 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #B3B3B3;
         }
         
         .user-status.online {
             color: #1DB954;
+        }
+        
+        .user-status.typing {
+            color: #1DB954;
+            font-style: italic;
         }
         
         .online-indicator {
@@ -202,6 +208,17 @@
         
         .user-status.online .online-indicator {
             background: #1DB954;
+        }
+        
+        .user-status.typing .online-indicator {
+            background: #FFA500;
+        }
+        
+        .typing-indicator {
+            color: #1DB954;
+            font-style: italic;
+            font-size: 0.8rem;
+            margin-top: 5px;
         }
         
         .chat-container {
@@ -243,12 +260,22 @@
             line-height: 1.4;
             word-wrap: break-word;
             max-width: 80%;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .message:hover {
+            background: rgba(40, 40, 40, 0.8);
         }
         
         .message.own {
             align-self: flex-end;
             background: rgba(29, 185, 84, 0.2);
             border: 1px solid rgba(29, 185, 84, 0.3);
+        }
+        
+        .message.own:hover {
+            background: rgba(29, 185, 84, 0.3);
         }
         
         .message.other {
@@ -268,13 +295,110 @@
             font-size: 0.7rem;
             color: #888;
             margin-left: 8px;
-            float: right;
+        }
+        
+        .message-edited {
+            font-size: 0.6rem;
+            color: #888;
+            font-style: italic;
+            margin-left: 5px;
+        }
+        
+        .message-reactions {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .reaction {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .reaction:hover {
+            background: rgba(29, 185, 84, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .reaction.active {
+            background: rgba(29, 185, 84, 0.5);
+            border-color: #1DB954;
+        }
+        
+        .reaction-count {
+            margin-left: 3px;
+            font-size: 0.6rem;
+        }
+        
+        .context-menu {
+            position: fixed;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 5px 0;
+            z-index: 1000;
+            min-width: 150px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: none;
+        }
+        
+        .context-menu-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+        }
+        
+        .context-menu-item:hover {
+            background: rgba(29, 185, 84, 0.3);
+        }
+        
+        .edit-message-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #1DB954;
+            border-radius: 8px;
+            padding: 8px;
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .edit-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .edit-btn {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        
+        .edit-save {
+            background: #1DB954;
+            color: white;
+        }
+        
+        .edit-cancel {
+            background: #666;
+            color: white;
         }
         
         .chat-input-container {
             display: flex;
             gap: 10px;
             margin-top: auto;
+            align-items: flex-end;
         }
         
         .chat-input {
@@ -346,6 +470,8 @@
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         
         .notification.show {
@@ -354,6 +480,38 @@
         
         .notification.error {
             background: #e74c3c;
+        }
+        
+        .notification-message {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        
+        .quick-reactions {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 5px;
+            display: none;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .quick-reaction {
+            padding: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        
+        .quick-reaction:hover {
+            background: rgba(29, 185, 84, 0.3);
+            transform: scale(1.2);
         }
     </style>
 </head>
@@ -393,12 +551,14 @@
                         <p>Войдите в систему</p>
                     </div>
                 </ul>
+                <div id="typingIndicator" class="typing-indicator" style="display: none;"></div>
             </div>
             
             <div class="chat-container">
                 <div class="chat-header">
                     <i class="fas fa-comments"></i>
                     <h3 id="currentChatUser">Общий чат</h3>
+                    <span id="typingStatus" class="typing-indicator" style="display: none; margin-left: auto;"></span>
                 </div>
                 
                 <div class="chat-messages" id="chatMessages">
@@ -419,7 +579,34 @@
         </div>
     </div>
     
-    <div class="notification" id="notification">Текст уведомления</div>
+    <div class="notification" id="notification">
+        <div id="notificationTitle">Новое сообщение</div>
+        <div id="notificationMessage" class="notification-message"></div>
+    </div>
+
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" id="editMessage">Редактировать</div>
+        <div class="context-menu-item" id="addReaction">Добавить реакцию</div>
+        <div class="context-menu-item" id="deleteMessage">Удалить</div>
+    </div>
+
+    <div class="quick-reactions" id="quickReactions">
+        <div class="quick-reaction" data-reaction="👍">👍</div>
+        <div class="quick-reaction" data-reaction="❤️">❤️</div>
+        <div class="quick-reaction" data-reaction="😂">😂</div>
+        <div class="quick-reaction" data-reaction="😮">😮</div>
+        <div class="quick-reaction" data-reaction="😢">😢</div>
+    </div>
+
+    <audio id="messageSentSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
+    </audio>
+    <audio id="messageReceivedSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
+    </audio>
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
+    </audio>
 
     <script>
         // Firebase конфигурация
@@ -447,29 +634,113 @@
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
         const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const contextMenu = document.getElementById('contextMenu');
+        const quickReactions = document.getElementById('quickReactions');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const typingStatus = document.getElementById('typingStatus');
+
+        // Аудио элементы
+        const messageSentSound = document.getElementById('messageSentSound');
+        const messageReceivedSound = document.getElementById('messageReceivedSound');
+        const notificationSound = document.getElementById('notificationSound');
+
+        // Создаем простые звуки
+        function createSoundElements() {
+            // Звук отправки сообщения (короткий бип)
+            const sentContext = new AudioContext();
+            const sentOscillator = sentContext.createOscillator();
+            const sentGain = sentContext.createGain();
+            sentOscillator.connect(sentGain);
+            sentGain.connect(sentContext.destination);
+            sentOscillator.frequency.value = 800;
+            sentGain.gain.value = 0.1;
+            sentOscillator.start();
+            sentOscillator.stop(sentContext.currentTime + 0.1);
+            
+            // Звук получения сообщения (двойной бип)
+            const receivedContext = new AudioContext();
+            const receivedOscillator = receivedContext.createOscillator();
+            const receivedGain = receivedContext.createGain();
+            receivedOscillator.connect(receivedGain);
+            receivedGain.connect(receivedContext.destination);
+            receivedOscillator.frequency.value = 600;
+            receivedGain.gain.value = 0.1;
+            receivedOscillator.start();
+            receivedOscillator.stop(receivedContext.currentTime + 0.1);
+            
+            // Звук уведомления (мелодичный)
+            const notifyContext = new AudioContext();
+            const notifyOscillator = notifyContext.createOscillator();
+            const notifyGain = notifyContext.createGain();
+            notifyOscillator.connect(notifyGain);
+            notifyGain.connect(notifyContext.destination);
+            notifyOscillator.frequency.value = 1000;
+            notifyGain.gain.value = 0.1;
+            notifyOscillator.start();
+            notifyOscillator.stop(notifyContext.currentTime + 0.3);
+        }
 
         // Переменные
         let currentUser = null;
         let selectedUser = null;
         let usersUnsubscribe = null;
         let messagesUnsubscribe = null;
+        let typingUnsubscribe = null;
         let pingInterval = null;
+        let typingTimeout = null;
+        let lastTypingTime = 0;
+        let selectedMessage = null;
 
         // Показать уведомление
-        function showNotification(message, type = 'info') {
-            notification.textContent = message;
+        function showNotification(title, message, type = 'info') {
+            if (document.hidden) {
+                // Браузерные уведомления
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification(title, {
+                        body: message,
+                        icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>"
+                    });
+                }
+                
+                // Проигрываем звук уведомления
+                playNotificationSound();
+            }
+            
+            // Встроенное уведомление
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
             notification.className = 'notification';
             notification.style.background = type === 'error' ? '#e74c3c' : '#1DB954';
             notification.classList.add('show');
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 3000);
+            }, 4000);
+        }
+
+        // Воспроизведение звуков
+        function playSentSound() {
+            createSoundElements(); // Простой звук отправки
+        }
+
+        function playReceivedSound() {
+            createSoundElements(); // Простой звук получения
+        }
+
+        function playNotificationSound() {
+            createSoundElements(); // Простой звук уведомления
         }
 
         // Обновить UI аутентификации
         function updateAuthUI(user) {
             if (user) {
+                // Запрашиваем разрешение на уведомления
+                if ("Notification" in window && Notification.permission === "default") {
+                    Notification.requestPermission();
+                }
+
                 // Пользователь вошел
                 authSection.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; color: white;">
@@ -507,7 +778,8 @@
                 // Устанавливаем статус offline при выходе
                 db.collection('messengerUsers').doc(currentUser.uid).set({
                     online: false,
-                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                    typing: false
                 }, { merge: true }).then(() => {
                     // Очищаем интервал пинга
                     if (pingInterval) {
@@ -535,15 +807,16 @@
                         email: user.email,
                         photoURL: user.photoURL,
                         lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-                        online: true
+                        online: true,
+                        typing: false
                     }, { merge: true });
                 })
                 .then(() => {
-                    showNotification('Успешный вход!');
+                    showNotification('Успех', 'Успешный вход!');
                 })
                 .catch((error) => {
                     console.error('Ошибка входа:', error);
-                    showNotification('Ошибка входа', 'error');
+                    showNotification('Ошибка', 'Ошибка входа', 'error');
                 });
         }
 
@@ -564,6 +837,32 @@
             }, 5000);
         }
 
+        // Отслеживание ввода сообщения
+        function handleTyping() {
+            if (!selectedUser || !currentUser) return;
+            
+            const now = Date.now();
+            if (now - lastTypingTime > 1000) {
+                lastTypingTime = now;
+                
+                // Устанавливаем статус "печатает"
+                db.collection('messengerUsers').doc(currentUser.uid).set({
+                    typing: true,
+                    typingTo: selectedUser.uid,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                
+                // Сбрасываем статус через 3 секунды
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    db.collection('messengerUsers').doc(currentUser.uid).set({
+                        typing: false,
+                        typingTo: null
+                    }, { merge: true });
+                }, 3000);
+            }
+        }
+
         // Загрузка пользователей с проверкой времени активности
         function loadUsers() {
             if (usersUnsubscribe) usersUnsubscribe();
@@ -582,12 +881,13 @@
                             const diffSeconds = (now - lastSeen) / 1000;
                             
                             const isOnline = user.online && diffSeconds < 15;
+                            const isTyping = user.typing && user.typingTo === currentUser.uid;
                             
                             if (isOnline) {
                                 onlineCountValue++;
                             }
                             
-                            addUserToList(user, isOnline);
+                            addUserToList(user, isOnline, isTyping);
                         }
                     });
 
@@ -603,17 +903,62 @@
                         `;
                     }
                 });
+
+            // Отслеживаем статус "печатает"
+            if (typingUnsubscribe) typingUnsubscribe();
+            typingUnsubscribe = db.collection('messengerUsers')
+                .where('typing', '==', true)
+                .where('typingTo', '==', currentUser.uid)
+                .onSnapshot((snapshot) => {
+                    let typingUsers = [];
+                    snapshot.forEach(doc => {
+                        const user = doc.data();
+                        typingUsers.push(user.displayName || 'Пользователь');
+                    });
+
+                    if (typingUsers.length > 0) {
+                        typingStatus.textContent = `${typingUsers.join(', ')} печатает...`;
+                        typingStatus.style.display = 'block';
+                    } else {
+                        typingStatus.style.display = 'none';
+                    }
+                });
+        }
+
+        // Форматирование времени последнего посещения
+        function formatLastSeen(lastSeen) {
+            if (!lastSeen) return 'никогда';
+            
+            const now = new Date();
+            const diffMs = now - lastSeen;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'только что';
+            if (diffMins < 60) return `${diffMins} мин назад`;
+            if (diffHours < 24) return `${diffHours} ч назад`;
+            if (diffDays < 7) return `${diffDays} д назад`;
+            return lastSeen.toLocaleDateString('ru-RU');
         }
 
         // Добавить пользователя в список
-        function addUserToList(user, isOnline) {
+        function addUserToList(user, isOnline, isTyping) {
             const li = document.createElement('li');
             li.className = 'user-item';
+            
+            const lastSeen = user.lastSeen ? user.lastSeen.toDate() : null;
+            const statusText = isTyping ? 'печатает...' : 
+                             isOnline ? 'онлайн' : 
+                             formatLastSeen(lastSeen);
+
             li.innerHTML = `
-                <div>${user.displayName || 'Пользователь'}</div>
-                <div class="user-status ${isOnline ? 'online' : ''}">
-                    <span class="online-indicator"></span> 
-                    ${isOnline ? 'онлайн' : 'не в сети'}
+                <div>
+                    <div>${user.displayName || 'Пользователь'}</div>
+                    <div class="user-status ${isOnline ? 'online' : ''} ${isTyping ? 'typing' : ''}">
+                        <span class="online-indicator"></span> 
+                        ${statusText}
+                    </div>
                 </div>
             `;
 
@@ -624,7 +969,7 @@
         // Выбор пользователя
         function selectUser(user) {
             if (!currentUser) {
-                showNotification('Войдите в систему', 'error');
+                showNotification('Ошибка', 'Войдите в систему', 'error');
                 return;
             }
 
@@ -662,13 +1007,23 @@
                     chatMessages.innerHTML = '';
 
                     let hasMessages = false;
+                    let lastMessageFromOther = false;
 
                     snapshot.forEach((doc) => {
                         const message = doc.data();
                         
-                        // Фильтруем на клиенте
                         if (message.chatId === chatId) {
-                            displayMessage(message);
+                            const isOwnMessage = message.senderId === currentUser.uid;
+                            
+                            // Проверяем, нужно ли проиграть звук
+                            if (!isOwnMessage && !lastMessageFromOther) {
+                                playReceivedSound();
+                                lastMessageFromOther = true;
+                            } else if (isOwnMessage) {
+                                lastMessageFromOther = false;
+                            }
+                            
+                            displayMessage(message, doc.id);
                             hasMessages = true;
                         }
                     });
@@ -691,10 +1046,11 @@
         }
 
         // Показать сообщение
-        function displayMessage(message) {
+        function displayMessage(message, messageId) {
             const messageDiv = document.createElement('div');
             const isOwnMessage = message.senderId === currentUser.uid;
             messageDiv.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            messageDiv.dataset.messageId = messageId;
 
             let timeString = 'только что';
             if (message.timestamp) {
@@ -702,13 +1058,155 @@
                 timeString = time.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             }
 
+            const editedBadge = message.edited ? '<span class="message-edited">(ред.)</span>' : '';
+
+            let reactionsHtml = '';
+            if (message.reactions && Object.keys(message.reactions).length > 0) {
+                reactionsHtml = '<div class="message-reactions">';
+                Object.entries(message.reactions).forEach(([reaction, users]) => {
+                    const userCount = Object.keys(users).length;
+                    const isReacted = users[currentUser.uid];
+                    reactionsHtml += `<span class="reaction ${isReacted ? 'active' : ''}" data-reaction="${reaction}">
+                        ${reaction}<span class="reaction-count">${userCount}</span>
+                    </span>`;
+                });
+                reactionsHtml += '</div>';
+            }
+
             messageDiv.innerHTML = `
                 <span class="message-user">${message.senderName || 'Аноним'}:</span>
                 ${message.text || ''}
+                ${editedBadge}
                 <span class="message-time">${timeString}</span>
+                ${reactionsHtml}
             `;
 
+            // Контекстное меню для сообщений
+            messageDiv.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                showContextMenu(e, message, messageId, isOwnMessage);
+            });
+
+            // Быстрые реакции по двойному клику
+            messageDiv.addEventListener('dblclick', () => {
+                addReaction(messageId, '❤️');
+            });
+
+            // Обработчики для реакций
+            messageDiv.querySelectorAll('.reaction').forEach(reaction => {
+                reaction.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const reactionType = reaction.dataset.reaction;
+                    addReaction(messageId, reactionType);
+                });
+            });
+
             chatMessages.appendChild(messageDiv);
+        }
+
+        // Показать контекстное меню
+        function showContextMenu(e, message, messageId, isOwnMessage) {
+            selectedMessage = { message, messageId, isOwnMessage };
+            
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+
+            // Показываем только доступные действия
+            document.getElementById('editMessage').style.display = isOwnMessage ? 'block' : 'none';
+            document.getElementById('deleteMessage').style.display = isOwnMessage ? 'block' : 'none';
+        }
+
+        // Редактирование сообщения
+        function editMessage() {
+            if (!selectedMessage) return;
+            
+            const messageDiv = document.querySelector(`[data-message-id="${selectedMessage.messageId}"]`);
+            const messageText = selectedMessage.message.text;
+            
+            messageDiv.innerHTML = `
+                <span class="message-user">${selectedMessage.message.senderName}:</span>
+                <input type="text" class="edit-message-input" value="${messageText}">
+                <div class="edit-buttons">
+                    <button class="edit-btn edit-save">Сохранить</button>
+                    <button class="edit-btn edit-cancel">Отмена</button>
+                </div>
+            `;
+            
+            const input = messageDiv.querySelector('.edit-message-input');
+            input.focus();
+            input.select();
+            
+            messageDiv.querySelector('.edit-save').addEventListener('click', () => {
+                saveMessageEdit(input.value);
+            });
+            
+            messageDiv.querySelector('.edit-cancel').addEventListener('click', () => {
+                loadMessages();
+            });
+            
+            contextMenu.style.display = 'none';
+        }
+
+        // Сохранение отредактированного сообщения
+        function saveMessageEdit(newText) {
+            if (!selectedMessage || !newText.trim()) return;
+            
+            db.collection('chat').doc(selectedMessage.messageId).update({
+                text: newText.trim(),
+                edited: true,
+                editedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                loadMessages();
+                showNotification('Успех', 'Сообщение отредактировано');
+            }).catch(error => {
+                console.error('Ошибка редактирования:', error);
+                showNotification('Ошибка', 'Не удалось отредактировать', 'error');
+            });
+        }
+
+        // Добавление реакции
+        function addReaction(messageId, reaction) {
+            if (!currentUser) return;
+            
+            const reactionPath = `reactions.${reaction}.${currentUser.uid}`;
+            
+            // Проверяем, есть ли уже такая реакция от пользователя
+            db.collection('chat').doc(messageId).get().then(doc => {
+                const message = doc.data();
+                const hasReaction = message.reactions && 
+                                  message.reactions[reaction] && 
+                                  message.reactions[reaction][currentUser.uid];
+                
+                if (hasReaction) {
+                    // Удаляем реакцию
+                    db.collection('chat').doc(messageId).update({
+                        [`reactions.${reaction}.${currentUser.uid}`]: firebase.firestore.FieldValue.delete()
+                    });
+                } else {
+                    // Добавляем реакцию
+                    db.collection('chat').doc(messageId).update({
+                        [reactionPath]: true
+                    });
+                }
+            });
+        }
+
+        // Показать быстрые реакции
+        function showQuickReactions(element) {
+            const rect = element.getBoundingClientRect();
+            quickReactions.style.display = 'flex';
+            quickReactions.style.left = (rect.left + rect.width / 2 - quickReactions.offsetWidth / 2) + 'px';
+            quickReactions.style.top = (rect.top - quickReactions.offsetHeight - 5) + 'px';
+            
+            quickReactions.querySelectorAll('.quick-reaction').forEach(btn => {
+                btn.onclick = () => {
+                    if (selectedMessage) {
+                        addReaction(selectedMessage.messageId, btn.dataset.reaction);
+                        quickReactions.style.display = 'none';
+                    }
+                };
+            });
         }
 
         // Отправка сообщений
@@ -723,17 +1221,26 @@
                 senderId: currentUser.uid,
                 senderName: currentUser.displayName || 'Пользователь',
                 text: text,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                edited: false,
+                reactions: {}
             };
 
             db.collection('chat').add(message)
                 .then(() => {
                     chatInput.value = '';
+                    playSentSound();
                     scrollToBottom();
+                    
+                    // Сбрасываем статус печатания
+                    db.collection('messengerUsers').doc(currentUser.uid).set({
+                        typing: false,
+                        typingTo: null
+                    }, { merge: true });
                 })
                 .catch((error) => {
                     console.error('Ошибка отправки:', error);
-                    showNotification('Ошибка отправки', 'error');
+                    showNotification('Ошибка', 'Ошибка отправки', 'error');
                 });
         }
 
@@ -764,6 +1271,8 @@
                 // Устанавливаем статус offline при закрытии страницы
                 db.collection('messengerUsers').doc(currentUser.uid).set({
                     online: false,
+                    typing: false,
+                    typingTo: null,
                     lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
             }
@@ -776,7 +1285,23 @@
             }
         });
 
+        chatInput.addEventListener('input', handleTyping);
+
         chatSendBtn.addEventListener('click', sendMessage);
+
+        // Закрытие контекстного меню при клике вне его
+        document.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            quickReactions.style.display = 'none';
+        });
+
+        // Обработчики контекстного меню
+        document.getElementById('editMessage').addEventListener('click', editMessage);
+        document.getElementById('addReaction').addEventListener('click', () => {
+            if (selectedMessage) {
+                showQuickReactions(contextMenu);
+            }
+        });
 
         // Слушатель аутентификации
         auth.onAuthStateChanged((user) => {
@@ -786,12 +1311,17 @@
             if (!user) {
                 if (usersUnsubscribe) usersUnsubscribe();
                 if (messagesUnsubscribe) messagesUnsubscribe();
+                if (typingUnsubscribe) typingUnsubscribe();
                 if (pingInterval) {
                     clearInterval(pingInterval);
                     pingInterval = null;
                 }
+                if (typingTimeout) {
+                    clearTimeout(typingTimeout);
+                }
                 usersList.innerHTML = '';
                 onlineCount.textContent = '0';
+                typingStatus.style.display = 'none';
             }
         });
 
@@ -802,6 +1332,11 @@
             // Обработчики закрытия страницы
             window.addEventListener('beforeunload', handleBeforeUnload);
             window.addEventListener('pagehide', handleBeforeUnload);
+            
+            // Запрашиваем разрешение на уведомления
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
         });
     </script>
 </body>
