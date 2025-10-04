@@ -504,36 +504,6 @@
             float: right;
         }
         
-        .message-reactions {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-            flex-wrap: wrap;
-        }
-        
-        .reaction {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 3px 8px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-        
-        .reaction:hover {
-            background: rgba(29, 185, 84, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .reaction-count {
-            font-size: 0.65rem;
-            color: #B3B3B3;
-        }
-        
         .chat-input-container {
             display: flex;
             gap: 10px;
@@ -546,7 +516,7 @@
             background: rgba(40, 40, 40, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 12px 15px 12px 50px;
+            padding: 12px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
             outline: none;
@@ -555,38 +525,6 @@
         
         .chat-input:focus {
             border-color: #1DB954;
-        }
-        
-        .emoji-btn, .gif-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: #B3B3B3;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.2s ease;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            z-index: 2;
-        }
-        
-        .emoji-btn {
-            left: 10px;
-        }
-        
-        .gif-btn {
-            left: 45px;
-        }
-        
-        .emoji-btn:hover, .gif-btn:hover {
-            background: rgba(29, 185, 84, 0.2);
-            color: #1DB954;
         }
         
         .chat-send-btn {
@@ -832,36 +770,6 @@
                 max-width: 100px;
             }
         }
-        
-        @media (max-width: 480px) {
-            .header-left, .header-right {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .user-name {
-                max-width: 80px;
-            }
-            
-            .theme-switcher, .back-to-radio, .google-login-btn {
-                font-size: 0.8rem;
-                padding: 6px 12px;
-            }
-            
-            h1 {
-                font-size: 1.2rem;
-            }
-            
-            .message {
-                max-width: 90%;
-                font-size: 0.8rem;
-            }
-            
-            .chat-input {
-                padding: 10px 15px 10px 45px;
-                font-size: 0.8rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1028,13 +936,12 @@
                             console.error('Ошибка обновления онлайн статуса:', error);
                         });
                     }
-                }, 5000); // Каждые 5 секунд обновляем статус
+                }, 5000);
             }
 
             // Обработчик закрытия страницы
             window.addEventListener('beforeunload', () => {
                 if (currentUser) {
-                    // Устанавливаем оффлайн статус
                     db.collection('messengerUsers').doc(currentUser.uid).update({
                         online: false,
                         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -1069,7 +976,6 @@
             // Функции для работы с аутентификацией и никами
             function updateAuthUI(user) {
                 if (user) {
-                    // ПОЛЬЗОВАТЕЛЬ ВОШЕЛ
                     const displayName = userNickname || user.displayName || 'Пользователь';
                     const firstLetter = displayName.charAt(0).toUpperCase();
                     
@@ -1091,11 +997,9 @@
                         </div>
                     `;
                     
-                    // Загружаем пользователей и запускаем онлайн-пинг
                     loadUsers();
                     startOnlinePing();
                     
-                    // Настраиваем обработчики для выпадающего меню
                     const userProfile = document.getElementById('user-profile');
                     const userDropdown = document.getElementById('user-dropdown');
                     const editNicknameDropdown = document.getElementById('edit-nickname-dropdown');
@@ -1120,7 +1024,6 @@
                     
                     signOutBtn.addEventListener('click', function() {
                         if (currentUser) {
-                            // Устанавливаем оффлайн статус перед выходом
                             db.collection('messengerUsers').doc(currentUser.uid).update({
                                 online: false,
                                 lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -1135,28 +1038,22 @@
                     });
                     
                 } else {
-                    // ПОЛЬЗОВАТЕЛЬ НЕ ВОШЕЛ
                     authSection.innerHTML = `
                         <button class="google-login-btn" id="googleLoginBtn">
                             <i class="fab fa-google"></i> Войти через Google
                         </button>
                     `;
                     
-                    // Добавляем обработчик для новой кнопки входа
                     document.getElementById('googleLoginBtn').addEventListener('click', signInWithGoogle);
                 }
             }
             
-            // 🔥 ПРОСТОЙ И РАБОЧИЙ ВХОД ЧЕРЕЗ GOOGLE
             function signInWithGoogle() {
                 const provider = new firebase.auth.GoogleAuthProvider();
-                
-                // Настраиваем провайдер
                 provider.setCustomParameters({
                     prompt: 'select_account'
                 });
                 
-                // Блокируем кнопку на время входа
                 const loginBtn = document.getElementById('googleLoginBtn');
                 const originalText = loginBtn.innerHTML;
                 loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
@@ -1167,7 +1064,6 @@
                         const user = result.user;
                         console.log('Успешный вход:', user);
                         
-                        // Сохраняем пользователя в Firestore
                         return db.collection('messengerUsers').doc(user.uid).set({
                             uid: user.uid,
                             displayName: user.displayName || 'Пользователь',
@@ -1183,8 +1079,6 @@
                     })
                     .catch((error) => {
                         console.error('Ошибка входа:', error);
-                        
-                        // Показываем понятное сообщение об ошибке
                         let errorMessage = 'Ошибка входа. Попробуйте снова.';
                         
                         if (error.code === 'auth/popup-closed-by-user') {
@@ -1198,7 +1092,6 @@
                         showNotification(errorMessage, 'error');
                     })
                     .finally(() => {
-                        // Восстанавливаем кнопку
                         loginBtn.innerHTML = originalText;
                         loginBtn.disabled = false;
                     });
@@ -1215,7 +1108,6 @@
                 localStorage.setItem('userNickname', userNickname);
                 nicknameModal.style.display = 'none';
                 
-                // Обновляем данные пользователя в Firestore
                 if (currentUser) {
                     db.collection('messengerUsers').doc(currentUser.uid).update({
                         nickname: userNickname
@@ -1301,54 +1193,61 @@
                 
                 selectedUser = user;
                 
-                // Обновляем UI
                 document.querySelectorAll('.user-item').forEach(item => {
                     item.classList.remove('active');
                 });
                 document.querySelector(`.user-item[data-user-id="${user.uid}"]`).classList.add('active');
                 
-                // Обновляем заголовок чата
                 const displayName = user.nickname || user.displayName || 'Пользователь';
                 currentChatUser.textContent = displayName;
                 
-                // Активируем поле ввода
                 chatInput.disabled = false;
                 chatInput.placeholder = `Введите сообщение для ${displayName}...`;
                 chatSendBtn.disabled = chatInput.value.trim() === '';
                 
-                // Загружаем сообщения
                 loadMessages();
             }
             
-            // 🔥 ИСПРАВЛЕННАЯ ЗАГРУЗКА СООБЩЕНИЙ
+            // 🔥 ИСПРАВЛЕННАЯ ЗАГРУЗКА СООБЩЕНИЙ - ПРОСТАЯ И РАБОЧАЯ
             function loadMessages() {
                 if (!selectedUser || !currentUser) {
-                    // Показываем общий чат если пользователь не выбран
                     showGeneralChat();
                     return;
                 }
                 
-                // Очищаем сообщения
-                chatMessages.innerHTML = '';
+                chatMessages.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Загрузка сообщений...</div>';
                 
-                // Создаем ID чата
                 const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
                 
-                // Отписываемся от предыдущего слушателя
                 if (messagesUnsubscribe) messagesUnsubscribe();
                 
-                // ПРОБУЕМ РАЗНЫЕ КОЛЛЕКЦИИ
-                const collectionsToTry = ['privateMessages', 'chats', 'messages'];
-                let currentCollectionIndex = 0;
+                console.log('🔄 Загружаем сообщения для чата:', chatId);
                 
-                function tryLoadFromCollection(collectionName) {
-                    console.log('🔄 Пробуем загрузить из коллекции:', collectionName);
+                // 🔥 ПРОБУЕМ ВСЕ ВОЗМОЖНЫЕ КОЛЛЕКЦИИ
+                const collections = ['privateMessages', 'chats', 'messages', 'messengerMessages'];
+                
+                const tryCollection = (index) => {
+                    if (index >= collections.length) {
+                        console.error('❌ Все коллекции недоступны');
+                        chatMessages.innerHTML = `
+                            <div class="no-chat-selected">
+                                <i class="fas fa-exclamation-triangle no-chat-icon"></i>
+                                <h3>Ошибка загрузки</h3>
+                                <p>Не удалось загрузить сообщения</p>
+                                <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #1DB954; border: none; border-radius: 8px; color: white; cursor: pointer;">Обновить страницу</button>
+                            </div>
+                        `;
+                        return;
+                    }
                     
-                    messagesUnsubscribe = db.collection(collectionName)
+                    const collection = collections[index];
+                    console.log(`🔄 Пробуем коллекцию: ${collection}`);
+                    
+                    messagesUnsubscribe = db.collection(collection)
                         .where('chatId', '==', chatId)
                         .orderBy('timestamp', 'asc')
                         .onSnapshot((snapshot) => {
-                            console.log('✅ Успешно подключились к коллекции:', collectionName);
+                            console.log(`✅ Успешно загружены сообщения из: ${collection}`);
                             
                             chatMessages.innerHTML = '';
                             
@@ -1363,36 +1262,24 @@
                                 return;
                             }
                             
+                            let hasMessages = false;
                             snapshot.forEach(doc => {
                                 const message = doc.data();
                                 displayMessage(message);
+                                hasMessages = true;
                             });
                             
-                            // Прокручиваем вниз
-                            scrollToBottom();
-                        }, error => {
-                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
-                            
-                            // Пробуем следующую коллекцию
-                            currentCollectionIndex++;
-                            if (currentCollectionIndex < collectionsToTry.length) {
-                                tryLoadFromCollection(collectionsToTry[currentCollectionIndex]);
-                            } else {
-                                console.error('Все коллекции недоступны');
-                                showNotification('Ошибка загрузки сообщений', 'error');
-                                chatMessages.innerHTML = `
-                                    <div class="no-chat-selected">
-                                        <i class="fas fa-exclamation-triangle no-chat-icon"></i>
-                                        <h3>Ошибка загрузки</h3>
-                                        <p>Не удалось загрузить сообщения</p>
-                                    </div>
-                                `;
+                            if (hasMessages) {
+                                scrollToBottom();
                             }
+                            
+                        }, error => {
+                            console.error(`❌ Ошибка в коллекции ${collection}:`, error);
+                            tryCollection(index + 1);
                         });
-                }
+                };
                 
-                // Начинаем с первой коллекции
-                tryLoadFromCollection(collectionsToTry[0]);
+                tryCollection(0);
             }
             
             function showGeneralChat() {
@@ -1460,48 +1347,46 @@
                     reactions: {}
                 };
                 
-                // Блокируем кнопку отправки
                 chatSendBtn.disabled = true;
                 chatSendBtn.classList.add('sending');
                 
-                // 🔥 УМНАЯ ОТПРАВКА В РАЗНЫЕ КОЛЛЕКЦИИ
-                const collectionsToTry = ['privateMessages', 'chats', 'messages'];
+                // 🔥 ПРОБУЕМ ВСЕ КОЛЛЕКЦИИ ДЛЯ ОТПРАВКИ
+                const collections = ['privateMessages', 'chats', 'messages', 'messengerMessages'];
                 
-                function trySendToCollection(collectionName, index) {
-                    db.collection(collectionName).add(message)
+                const trySend = (index) => {
+                    if (index >= collections.length) {
+                        console.error('❌ Все коллекции недоступны для отправки');
+                        showNotification('Ошибка отправки сообщения', 'error');
+                        chatSendBtn.disabled = false;
+                        chatSendBtn.classList.remove('sending');
+                        return;
+                    }
+                    
+                    const collection = collections[index];
+                    console.log(`🔄 Пробуем отправить в: ${collection}`);
+                    
+                    db.collection(collection).add(message)
                         .then(() => {
-                            console.log('✅ Сообщение отправлено в коллекцию:', collectionName);
+                            console.log(`✅ Сообщение отправлено в: ${collection}`);
                             chatInput.value = '';
                             showNotification('Сообщение отправлено!', 'success');
-                            
-                            // Прокручиваем к последнему сообщению
                             scrollToBottom();
-                        })
-                        .catch(error => {
-                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
-                            
-                            // Пробуем следующую коллекцию
-                            if (index + 1 < collectionsToTry.length) {
-                                trySendToCollection(collectionsToTry[index + 1], index + 1);
-                            } else {
-                                // Все коллекции провалились
-                                console.error('Все коллекции недоступны');
-                                showNotification('Ошибка отправки сообщения', 'error');
-                            }
-                        })
-                        .finally(() => {
-                            // Восстанавливаем кнопку отправки
                             chatSendBtn.disabled = false;
                             chatSendBtn.classList.remove('sending');
+                        })
+                        .catch(error => {
+                            console.error(`❌ Ошибка отправки в ${collection}:`, error);
+                            trySend(index + 1);
                         });
-                }
+                };
                 
-                // Начинаем с первой коллекции
-                trySendToCollection(collectionsToTry[0], 0);
+                trySend(0);
             }
             
             function scrollToBottom() {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 100);
             }
             
             // Обработчики чата
@@ -1525,9 +1410,8 @@
                 updateAuthUI(user);
                 
                 if (user) {
-                    startOnlinePing(); // Запускаем пинг при входе
+                    startOnlinePing();
                 } else {
-                    // Очищаем чат если пользователь вышел
                     showGeneralChat();
                     usersList.innerHTML = '';
                     onlineCount.textContent = '0';
@@ -1541,7 +1425,6 @@
             
             // Переключение темы
             themeSwitcher.addEventListener('click', function() {
-                // Простое переключение темы
                 document.body.classList.toggle('light-theme');
                 const isLight = document.body.classList.contains('light-theme');
                 themeSwitcher.innerHTML = isLight ? 
