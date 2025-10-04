@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deynik Messenger</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -540,15 +540,14 @@
         <div class="content">
             <div class="side-panel">
                 <div class="users-header">
-                    <h3>Пользователи онлайн</h3>
-                    <span class="online-count" id="onlineCount">0</span>
+                    <h3>Пользователи</h3>
+                    <span class="online-count" id="onlineCount">0 онлайн</span>
                 </div>
                 
                 <ul class="users-list" id="usersList">
                     <div class="no-chat-selected" style="display: flex;">
                         <i class="fas fa-users no-chat-icon"></i>
-                        <h3>Нет пользователей онлайн</h3>
-                        <p>Войдите в систему</p>
+                        <h3>Загрузка пользователей...</h3>
                     </div>
                 </ul>
                 <div id="typingIndicator" class="typing-indicator" style="display: none;"></div>
@@ -598,15 +597,7 @@
         <div class="quick-reaction" data-reaction="😢">😢</div>
     </div>
 
-    <audio id="messageSentSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
-    </audio>
-    <audio id="messageReceivedSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
-    </audio>
-    <audio id="notificationSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" type="audio/wav">
-    </audio>
+    <audio id="notificationSound" preload="auto"></audio>
 
     <script>
         // Firebase конфигурация
@@ -640,46 +631,28 @@
         const quickReactions = document.getElementById('quickReactions');
         const typingIndicator = document.getElementById('typingIndicator');
         const typingStatus = document.getElementById('typingStatus');
-
-        // Аудио элементы
-        const messageSentSound = document.getElementById('messageSentSound');
-        const messageReceivedSound = document.getElementById('messageReceivedSound');
         const notificationSound = document.getElementById('notificationSound');
 
-        // Создаем простые звуки
-        function createSoundElements() {
-            // Звук отправки сообщения (короткий бип)
-            const sentContext = new AudioContext();
-            const sentOscillator = sentContext.createOscillator();
-            const sentGain = sentContext.createGain();
-            sentOscillator.connect(sentGain);
-            sentGain.connect(sentContext.destination);
-            sentOscillator.frequency.value = 800;
-            sentGain.gain.value = 0.1;
-            sentOscillator.start();
-            sentOscillator.stop(sentContext.currentTime + 0.1);
+        // Создаем приятный звук уведомления
+        function createNotificationSound() {
+            const context = new AudioContext();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
             
-            // Звук получения сообщения (двойной бип)
-            const receivedContext = new AudioContext();
-            const receivedOscillator = receivedContext.createOscillator();
-            const receivedGain = receivedContext.createGain();
-            receivedOscillator.connect(receivedGain);
-            receivedGain.connect(receivedContext.destination);
-            receivedOscillator.frequency.value = 600;
-            receivedGain.gain.value = 0.1;
-            receivedOscillator.start();
-            receivedOscillator.stop(receivedContext.currentTime + 0.1);
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
             
-            // Звук уведомления (мелодичный)
-            const notifyContext = new AudioContext();
-            const notifyOscillator = notifyContext.createOscillator();
-            const notifyGain = notifyContext.createGain();
-            notifyOscillator.connect(notifyGain);
-            notifyGain.connect(notifyContext.destination);
-            notifyOscillator.frequency.value = 1000;
-            notifyGain.gain.value = 0.1;
-            notifyOscillator.start();
-            notifyOscillator.stop(notifyContext.currentTime + 0.3);
+            // Приятная мелодия для уведомления
+            oscillator.frequency.setValueAtTime(800, context.currentTime);
+            oscillator.frequency.setValueAtTime(1000, context.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(600, context.currentTime + 0.2);
+            
+            gainNode.gain.setValueAtTime(0, context.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, context.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, context.currentTime + 0.3);
+            
+            oscillator.start(context.currentTime);
+            oscillator.stop(context.currentTime + 0.3);
         }
 
         // Переменные
@@ -705,7 +678,7 @@
                 }
                 
                 // Проигрываем звук уведомления
-                playNotificationSound();
+                createNotificationSound();
             }
             
             // Встроенное уведомление
@@ -718,19 +691,6 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 4000);
-        }
-
-        // Воспроизведение звуков
-        function playSentSound() {
-            createSoundElements(); // Простой звук отправки
-        }
-
-        function playReceivedSound() {
-            createSoundElements(); // Простой звук получения
-        }
-
-        function playNotificationSound() {
-            createSoundElements(); // Простой звук уведомления
         }
 
         // Обновить UI аутентификации
@@ -863,7 +823,7 @@
             }
         }
 
-        // Загрузка пользователей с проверкой времени активности
+        // Загрузка всех пользователей (онлайн и офлайн)
         function loadUsers() {
             if (usersUnsubscribe) usersUnsubscribe();
 
@@ -871,6 +831,7 @@
                 .onSnapshot((snapshot) => {
                     usersList.innerHTML = '';
                     let onlineCountValue = 0;
+                    let hasUsers = false;
 
                     snapshot.forEach((doc) => {
                         const user = doc.data();
@@ -888,17 +849,18 @@
                             }
                             
                             addUserToList(user, isOnline, isTyping);
+                            hasUsers = true;
                         }
                     });
 
-                    onlineCount.textContent = onlineCountValue;
+                    onlineCount.textContent = `${onlineCountValue} онлайн`;
 
-                    if (onlineCountValue === 0) {
+                    if (!hasUsers) {
                         usersList.innerHTML = `
                             <div class="no-chat-selected" style="display: flex;">
                                 <i class="fas fa-users no-chat-icon"></i>
-                                <h3>Нет пользователей онлайн</h3>
-                                <p>Будьте первым!</p>
+                                <h3>Нет других пользователей</h3>
+                                <p>Пригласите друзей!</p>
                             </div>
                         `;
                     }
@@ -1007,22 +969,11 @@
                     chatMessages.innerHTML = '';
 
                     let hasMessages = false;
-                    let lastMessageFromOther = false;
 
                     snapshot.forEach((doc) => {
                         const message = doc.data();
                         
                         if (message.chatId === chatId) {
-                            const isOwnMessage = message.senderId === currentUser.uid;
-                            
-                            // Проверяем, нужно ли проиграть звук
-                            if (!isOwnMessage && !lastMessageFromOther) {
-                                playReceivedSound();
-                                lastMessageFromOther = true;
-                            } else if (isOwnMessage) {
-                                lastMessageFromOther = false;
-                            }
-                            
                             displayMessage(message, doc.id);
                             hasMessages = true;
                         }
@@ -1066,7 +1017,7 @@
                 Object.entries(message.reactions).forEach(([reaction, users]) => {
                     const userCount = Object.keys(users).length;
                     const isReacted = users[currentUser.uid];
-                    reactionsHtml += `<span class="reaction ${isReacted ? 'active' : ''}" data-reaction="${reaction}">
+                    reactionsHtml += `<span class="reaction ${isReacted ? 'active' : ''}" data-reaction="${reaction}" data-message-id="${messageId}">
                         ${reaction}<span class="reaction-count">${userCount}</span>
                     </span>`;
                 });
@@ -1097,6 +1048,7 @@
                 reaction.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const reactionType = reaction.dataset.reaction;
+                    const messageId = reaction.dataset.messageId;
                     addReaction(messageId, reactionType);
                 });
             });
@@ -1115,6 +1067,7 @@
             // Показываем только доступные действия
             document.getElementById('editMessage').style.display = isOwnMessage ? 'block' : 'none';
             document.getElementById('deleteMessage').style.display = isOwnMessage ? 'block' : 'none';
+            document.getElementById('addReaction').style.display = 'block';
         }
 
         // Редактирование сообщения
@@ -1144,6 +1097,25 @@
             messageDiv.querySelector('.edit-cancel').addEventListener('click', () => {
                 loadMessages();
             });
+            
+            contextMenu.style.display = 'none';
+        }
+
+        // Удаление сообщения
+        function deleteMessage() {
+            if (!selectedMessage) return;
+            
+            if (confirm('Вы уверены, что хотите удалить это сообщение?')) {
+                db.collection('chat').doc(selectedMessage.messageId).delete()
+                    .then(() => {
+                        showNotification('Успех', 'Сообщение удалено');
+                        loadMessages();
+                    })
+                    .catch(error => {
+                        console.error('Ошибка удаления:', error);
+                        showNotification('Ошибка', 'Не удалось удалить сообщение', 'error');
+                    });
+            }
             
             contextMenu.style.display = 'none';
         }
@@ -1204,6 +1176,7 @@
                     if (selectedMessage) {
                         addReaction(selectedMessage.messageId, btn.dataset.reaction);
                         quickReactions.style.display = 'none';
+                        contextMenu.style.display = 'none';
                     }
                 };
             });
@@ -1229,7 +1202,6 @@
             db.collection('chat').add(message)
                 .then(() => {
                     chatInput.value = '';
-                    playSentSound();
                     scrollToBottom();
                     
                     // Сбрасываем статус печатания
@@ -1237,6 +1209,9 @@
                         typing: false,
                         typingTo: null
                     }, { merge: true });
+
+                    // Показываем уведомление для получателя
+                    showNotification('Сообщение отправлено', `Пользователю: ${selectedUser.displayName}`);
                 })
                 .catch((error) => {
                     console.error('Ошибка отправки:', error);
@@ -1302,6 +1277,7 @@
                 showQuickReactions(contextMenu);
             }
         });
+        document.getElementById('deleteMessage').addEventListener('click', deleteMessage);
 
         // Слушатель аутентификации
         auth.onAuthStateChanged((user) => {
@@ -1320,7 +1296,7 @@
                     clearTimeout(typingTimeout);
                 }
                 usersList.innerHTML = '';
-                onlineCount.textContent = '0';
+                onlineCount.textContent = '0 онлайн';
                 typingStatus.style.display = 'none';
             }
         });
