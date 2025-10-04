@@ -230,6 +230,7 @@
             padding: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
+            position: relative;
         }
         
         .chat-header {
@@ -518,8 +519,11 @@
             color: #1DB954;
             font-style: italic;
             font-size: 0.8rem;
-            margin-left: auto;
             padding: 5px 10px;
+            position: absolute;
+            bottom: 60px;
+            left: 15px;
+            display: none;
         }
     </style>
 </head>
@@ -558,14 +562,12 @@
                         <h3>Загрузка пользователей...</h3>
                     </div>
                 </ul>
-                <div id="typingIndicator" class="typing-indicator" style="display: none;"></div>
             </div>
             
             <div class="chat-container">
                 <div class="chat-header">
                     <i class="fas fa-comments"></i>
                     <h3 id="currentChatUser">Общий чат</h3>
-                    <div id="typingStatus" class="typing-status" style="display: none;"></div>
                 </div>
                 
                 <div class="chat-messages" id="chatMessages">
@@ -575,6 +577,8 @@
                         <p>Выберите пользователя из списка слева</p>
                     </div>
                 </div>
+
+                <div id="typingStatus" class="typing-status"></div>
                 
                 <div class="chat-input-container">
                     <input type="text" class="chat-input" id="chat-input" placeholder="Войдите в систему" disabled>
@@ -604,10 +608,6 @@
         <div class="quick-reaction" data-reaction="😮">😮</div>
         <div class="quick-reaction" data-reaction="😢">😢</div>
     </div>
-
-    <audio id="notificationSound" preload="auto">
-        <source src="https://assets.mixkit.co/active_storage/sfx/151/151-preview.mp3" type="audio/mpeg">
-    </audio>
 
     <script>
         // Firebase конфигурация
@@ -639,9 +639,7 @@
         const notificationMessage = document.getElementById('notificationMessage');
         const contextMenu = document.getElementById('contextMenu');
         const quickReactions = document.getElementById('quickReactions');
-        const typingIndicator = document.getElementById('typingIndicator');
         const typingStatus = document.getElementById('typingStatus');
-        const notificationSound = document.getElementById('notificationSound');
 
         // Переменные
         let currentUser = null;
@@ -655,19 +653,44 @@
         let selectedMessage = null;
         let lastMessageSoundTime = 0;
 
+        // Создание звука уведомления
+        function createNotificationSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Приятный звук уведомления
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.05);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log('Audio context not supported');
+            }
+        }
+
         // Воспроизведение звука уведомления
         function playNotificationSound() {
             const now = Date.now();
-            if (now - lastMessageSoundTime > 1000) { // Защита от спама звуков
-                notificationSound.currentTime = 0;
-                notificationSound.play().catch(e => console.log('Ошибка воспроизведения звука:', e));
+            if (now - lastMessageSoundTime > 1000) {
+                createNotificationSound();
                 lastMessageSoundTime = now;
             }
         }
 
         // Показать уведомление
         function showNotification(title, message, type = 'info', playSound = false) {
-            if (playSound && document.hidden) {
+            if (playSound) {
                 playNotificationSound();
             }
             
@@ -971,7 +994,6 @@
                     chatMessages.innerHTML = '';
 
                     let hasMessages = false;
-                    let lastMessageFromOther = false;
 
                     snapshot.forEach((doc) => {
                         const message = doc.data();
@@ -987,7 +1009,9 @@
                                 
                                 if (diff < 5) { // Сообщение пришло менее 5 секунд назад
                                     playNotificationSound();
-                                    showNotification('Новое сообщение', `${message.senderName}: ${message.text}`, 'info', false);
+                                    if (document.hidden) {
+                                        showNotification('Новое сообщение', `${message.senderName}: ${message.text}`, 'info', false);
+                                    }
                                 }
                             }
                             
@@ -1035,10 +1059,13 @@
                 reactionsHtml = '<div class="message-reactions">';
                 Object.entries(message.reactions).forEach(([reaction, users]) => {
                     const userCount = Object.keys(users).length;
-                    const isReacted = users[currentUser.uid];
-                    reactionsHtml += `<span class="reaction ${isReacted ? 'active' : ''}" data-reaction="${reaction}" data-message-id="${messageId}">
-                        ${reaction}<span class="reaction-count">${userCount}</span>
-                    </span>`;
+                    // Не показываем реакции с 0 пользователей
+                    if (userCount > 0) {
+                        const isReacted = users[currentUser.uid];
+                        reactionsHtml += `<span class="reaction ${isReacted ? 'active' : ''}" data-reaction="${reaction}" data-message-id="${messageId}">
+                            ${reaction}<span class="reaction-count">${userCount}</span>
+                        </span>`;
+                    }
                 });
                 reactionsHtml += '</div>';
             }
@@ -1161,8 +1188,6 @@
         function addReaction(messageId, reaction) {
             if (!currentUser) return;
             
-            const reactionPath = `reactions.${reaction}.${currentUser.uid}`;
-            
             // Проверяем, есть ли уже такая реакция от пользователя
             db.collection('chat').doc(messageId).get().then(doc => {
                 if (!doc.exists) return;
@@ -1179,10 +1204,7 @@
                     updateData[`reactions.${reaction}.${currentUser.uid}`] = firebase.firestore.FieldValue.delete();
                 } else {
                     // Добавляем реакцию
-                    if (!message.reactions) {
-                        updateData['reactions'] = {};
-                    }
-                    updateData[reactionPath] = true;
+                    updateData[`reactions.${reaction}.${currentUser.uid}`] = true;
                 }
                 
                 db.collection('chat').doc(messageId).update(updateData)
@@ -1288,6 +1310,7 @@
 
         chatInput.addEventListener('input', handleTyping);
 
+        // ФИКС: Правильный обработчик для кнопки отправки
         chatSendBtn.addEventListener('click', function(e) {
             e.preventDefault();
             sendMessage();
@@ -1344,9 +1367,6 @@
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
-
-            // Предзагрузка звука
-            notificationSound.load();
         });
     </script>
 </body>
