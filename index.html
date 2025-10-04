@@ -195,9 +195,13 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #1DB954;
+            background: #B3B3B3;
             display: inline-block;
             margin-right: 5px;
+        }
+        
+        .user-status.online .online-indicator {
+            background: #1DB954;
         }
         
         .chat-container {
@@ -449,6 +453,7 @@
         let selectedUser = null;
         let usersUnsubscribe = null;
         let messagesUnsubscribe = null;
+        let pingInterval = null;
 
         // Показать уведомление
         function showNotification(message, type = 'info') {
@@ -478,9 +483,7 @@
                     </div>
                 `;
 
-                document.getElementById('logoutBtn').addEventListener('click', () => {
-                    auth.signOut();
-                });
+                document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
                 loadUsers();
                 startOnlinePing();
@@ -495,6 +498,27 @@
 
                 document.getElementById('googleLoginBtn').addEventListener('click', signInWithGoogle);
                 showGeneralChat();
+            }
+        }
+
+        // Обработчик выхода
+        function handleLogout() {
+            if (currentUser) {
+                // Устанавливаем статус offline при выходе
+                db.collection('messengerUsers').doc(currentUser.uid).set({
+                    online: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).then(() => {
+                    // Очищаем интервал пинга
+                    if (pingInterval) {
+                        clearInterval(pingInterval);
+                        pingInterval = null;
+                    }
+                    // Выходим из Firebase Auth
+                    auth.signOut();
+                });
+            } else {
+                auth.signOut();
             }
         }
 
@@ -525,7 +549,12 @@
 
         // Онлайн пинг
         function startOnlinePing() {
-            setInterval(() => {
+            // Очищаем предыдущий интервал если есть
+            if (pingInterval) {
+                clearInterval(pingInterval);
+            }
+            
+            pingInterval = setInterval(() => {
                 if (currentUser) {
                     db.collection('messengerUsers').doc(currentUser.uid).set({
                         online: true,
@@ -535,27 +564,36 @@
             }, 5000);
         }
 
-        // Загрузка пользователей
+        // Загрузка пользователей с проверкой времени активности
         function loadUsers() {
             if (usersUnsubscribe) usersUnsubscribe();
 
             usersUnsubscribe = db.collection('messengerUsers')
-                .where('online', '==', true)
                 .onSnapshot((snapshot) => {
                     usersList.innerHTML = '';
-                    let count = 0;
+                    let onlineCountValue = 0;
 
                     snapshot.forEach((doc) => {
                         const user = doc.data();
                         if (user.uid !== currentUser.uid) {
-                            addUserToList(user);
-                            count++;
+                            // Проверяем, был ли пользователь активен в последние 15 секунд
+                            const lastSeen = user.lastSeen ? user.lastSeen.toDate() : new Date();
+                            const now = new Date();
+                            const diffSeconds = (now - lastSeen) / 1000;
+                            
+                            const isOnline = user.online && diffSeconds < 15;
+                            
+                            if (isOnline) {
+                                onlineCountValue++;
+                            }
+                            
+                            addUserToList(user, isOnline);
                         }
                     });
 
-                    onlineCount.textContent = count;
+                    onlineCount.textContent = onlineCountValue;
 
-                    if (count === 0) {
+                    if (onlineCountValue === 0) {
                         usersList.innerHTML = `
                             <div class="no-chat-selected" style="display: flex;">
                                 <i class="fas fa-users no-chat-icon"></i>
@@ -568,13 +606,14 @@
         }
 
         // Добавить пользователя в список
-        function addUserToList(user) {
+        function addUserToList(user, isOnline) {
             const li = document.createElement('li');
             li.className = 'user-item';
             li.innerHTML = `
                 <div>${user.displayName || 'Пользователь'}</div>
-                <div class="user-status online">
-                    <span class="online-indicator"></span> онлайн
+                <div class="user-status ${isOnline ? 'online' : ''}">
+                    <span class="online-indicator"></span> 
+                    ${isOnline ? 'онлайн' : 'не в сети'}
                 </div>
             `;
 
@@ -607,7 +646,7 @@
             loadMessages();
         }
 
-        // 🔥 САМАЯ ПРОСТАЯ ЗАГРУЗКА СООБЩЕНИЙ
+        // Загрузка сообщений
         function loadMessages() {
             if (!selectedUser || !currentUser) return;
 
@@ -617,7 +656,6 @@
 
             if (messagesUnsubscribe) messagesUnsubscribe();
 
-            // 🔥 ПРОСТОЙ ЗАПРОС БЕЗ УСЛОВИЙ - ЗАГРУЖАЕМ ВСЕ СООБЩЕНИЯ
             messagesUnsubscribe = db.collection('chat')
                 .orderBy('timestamp', 'asc')
                 .onSnapshot((snapshot) => {
@@ -628,7 +666,7 @@
                     snapshot.forEach((doc) => {
                         const message = doc.data();
                         
-                        // 🔥 ФИЛЬТРУЕМ НА КЛИЕНТЕ - ПРОСТО И РАБОЧЕ
+                        // Фильтруем на клиенте
                         if (message.chatId === chatId) {
                             displayMessage(message);
                             hasMessages = true;
@@ -673,7 +711,7 @@
             chatMessages.appendChild(messageDiv);
         }
 
-        // 🔥 САМАЯ ПРОСТАЯ ОТПРАВКА СООБЩЕНИЙ
+        // Отправка сообщений
         function sendMessage() {
             const text = chatInput.value.trim();
             if (!text || !selectedUser || !currentUser) return;
@@ -688,11 +726,9 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            // 🔥 ПРОСТО СОХРАНЯЕМ В COLLECTION 'chat'
             db.collection('chat').add(message)
                 .then(() => {
                     chatInput.value = '';
-                    showNotification('Сообщение отправлено!');
                     scrollToBottom();
                 })
                 .catch((error) => {
@@ -722,6 +758,17 @@
             selectedUser = null;
         }
 
+        // Обработчик закрытия страницы
+        function handleBeforeUnload() {
+            if (currentUser) {
+                // Устанавливаем статус offline при закрытии страницы
+                db.collection('messengerUsers').doc(currentUser.uid).set({
+                    online: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
+        }
+
         // Обработчики событий
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !chatSendBtn.disabled) {
@@ -739,6 +786,10 @@
             if (!user) {
                 if (usersUnsubscribe) usersUnsubscribe();
                 if (messagesUnsubscribe) messagesUnsubscribe();
+                if (pingInterval) {
+                    clearInterval(pingInterval);
+                    pingInterval = null;
+                }
                 usersList.innerHTML = '';
                 onlineCount.textContent = '0';
             }
@@ -747,6 +798,10 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             googleLoginBtn.addEventListener('click', signInWithGoogle);
+            
+            // Обработчики закрытия страницы
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            window.addEventListener('pagehide', handleBeforeUnload);
         });
     </script>
 </body>
