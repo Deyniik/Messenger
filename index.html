@@ -865,7 +865,7 @@
     <div class="notification" id="notification">Текст уведомления</div>
 
     <script>
-        // 🔥 ПРАВИЛЬНАЯ КОНФИГУРАЦИЯ FIREBASE
+        // 🔥 ТОЧНО ТАКАЯ ЖЕ КОНФИГУРАЦИЯ КАК В DEYNIK RADIO
         const firebaseConfig = {
             apiKey: "AIzaSyBk4nxZ1ldNQUCxsbgaeYTkm9stq0o9o2Q",
             authDomain: "deygram-e4814.firebaseapp.com",
@@ -918,7 +918,7 @@
             let userNickname = localStorage.getItem('userNickname') || '';
             let onlineCheckInterval;
 
-            // 🔥 НАДЕЖНАЯ СИСТЕМА ОНЛАЙН СТАТУСОВ
+            // 🔥 ТОЧНО ТАКАЯ ЖЕ СИСТЕМА ОНЛАЙН СТАТУСОВ КАК В DEYNIK RADIO
             function startOnlinePing() {
                 if (onlineCheckInterval) clearInterval(onlineCheckInterval);
                 
@@ -1208,7 +1208,7 @@
                 loadMessages();
             }
             
-            // 🔥 ИСПРАВЛЕННАЯ ЗАГРУЗКА СООБЩЕНИЙ - ПРОСТАЯ И РАБОЧАЯ
+            // 🔥 ТОЧНО ТАКАЯ ЖЕ СИСТЕМА ЧАТА КАК В DEYNIK RADIO
             function loadMessages() {
                 if (!selectedUser || !currentUser) {
                     showGeneralChat();
@@ -1217,18 +1217,46 @@
                 
                 chatMessages.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Загрузка сообщений...</div>';
                 
+                // Создаем ID чата
                 const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
                 
                 if (messagesUnsubscribe) messagesUnsubscribe();
                 
                 console.log('🔄 Загружаем сообщения для чата:', chatId);
                 
-                // 🔥 ПРОБУЕМ ВСЕ ВОЗМОЖНЫЕ КОЛЛЕКЦИИ
-                const collections = ['privateMessages', 'chats', 'messages', 'messengerMessages'];
-                
-                const tryCollection = (index) => {
-                    if (index >= collections.length) {
-                        console.error('❌ Все коллекции недоступны');
+                // 🔥 ПРОСТОЙ ВАРИАНТ - ИСПОЛЬЗУЕМ ТОЛЬКО КОЛЛЕКЦИЮ chat КАК В DEYNIK RADIO
+                messagesUnsubscribe = db.collection('chat')
+                    .where('chatId', '==', chatId)
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot((snapshot) => {
+                        console.log('✅ Сообщения загружены из коллекции chat');
+                        
+                        chatMessages.innerHTML = '';
+                        
+                        if (snapshot.empty) {
+                            chatMessages.innerHTML = `
+                                <div class="no-chat-selected">
+                                    <i class="fas fa-comments no-chat-icon"></i>
+                                    <h3>Начните общение!</h3>
+                                    <p>Это начало вашей переписки с ${selectedUser.nickname || selectedUser.displayName || 'Пользователем'}</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        let hasMessages = false;
+                        snapshot.forEach(doc => {
+                            const message = doc.data();
+                            displayMessage(message);
+                            hasMessages = true;
+                        });
+                        
+                        if (hasMessages) {
+                            scrollToBottom();
+                        }
+                        
+                    }, error => {
+                        console.error('❌ Ошибка загрузки сообщений:', error);
                         chatMessages.innerHTML = `
                             <div class="no-chat-selected">
                                 <i class="fas fa-exclamation-triangle no-chat-icon"></i>
@@ -1237,49 +1265,7 @@
                                 <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #1DB954; border: none; border-radius: 8px; color: white; cursor: pointer;">Обновить страницу</button>
                             </div>
                         `;
-                        return;
-                    }
-                    
-                    const collection = collections[index];
-                    console.log(`🔄 Пробуем коллекцию: ${collection}`);
-                    
-                    messagesUnsubscribe = db.collection(collection)
-                        .where('chatId', '==', chatId)
-                        .orderBy('timestamp', 'asc')
-                        .onSnapshot((snapshot) => {
-                            console.log(`✅ Успешно загружены сообщения из: ${collection}`);
-                            
-                            chatMessages.innerHTML = '';
-                            
-                            if (snapshot.empty) {
-                                chatMessages.innerHTML = `
-                                    <div class="no-chat-selected">
-                                        <i class="fas fa-comments no-chat-icon"></i>
-                                        <h3>Начните общение!</h3>
-                                        <p>Это начало вашей переписки с ${selectedUser.nickname || selectedUser.displayName || 'Пользователем'}</p>
-                                    </div>
-                                `;
-                                return;
-                            }
-                            
-                            let hasMessages = false;
-                            snapshot.forEach(doc => {
-                                const message = doc.data();
-                                displayMessage(message);
-                                hasMessages = true;
-                            });
-                            
-                            if (hasMessages) {
-                                scrollToBottom();
-                            }
-                            
-                        }, error => {
-                            console.error(`❌ Ошибка в коллекции ${collection}:`, error);
-                            tryCollection(index + 1);
-                        });
-                };
-                
-                tryCollection(0);
+                    });
             }
             
             function showGeneralChat() {
@@ -1329,7 +1315,7 @@
                 chatMessages.appendChild(messageDiv);
             }
             
-            // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
+            // 🔥 ТОЧНО ТАКАЯ ЖЕ ОТПРАВКА СООБЩЕНИЙ КАК В DEYNIK RADIO
             function sendMessage() {
                 const text = chatInput.value.trim();
                 
@@ -1350,37 +1336,22 @@
                 chatSendBtn.disabled = true;
                 chatSendBtn.classList.add('sending');
                 
-                // 🔥 ПРОБУЕМ ВСЕ КОЛЛЕКЦИИ ДЛЯ ОТПРАВКИ
-                const collections = ['privateMessages', 'chats', 'messages', 'messengerMessages'];
-                
-                const trySend = (index) => {
-                    if (index >= collections.length) {
-                        console.error('❌ Все коллекции недоступны для отправки');
+                // 🔥 ПРОСТОЙ ВАРИАНТ - ОТПРАВЛЯЕМ ТОЛЬКО В КОЛЛЕКЦИЮ chat
+                db.collection('chat').add(message)
+                    .then(() => {
+                        console.log('✅ Сообщение отправлено в коллекцию chat');
+                        chatInput.value = '';
+                        showNotification('Сообщение отправлено!', 'success');
+                        scrollToBottom();
+                    })
+                    .catch(error => {
+                        console.error('❌ Ошибка отправки сообщения:', error);
                         showNotification('Ошибка отправки сообщения', 'error');
+                    })
+                    .finally(() => {
                         chatSendBtn.disabled = false;
                         chatSendBtn.classList.remove('sending');
-                        return;
-                    }
-                    
-                    const collection = collections[index];
-                    console.log(`🔄 Пробуем отправить в: ${collection}`);
-                    
-                    db.collection(collection).add(message)
-                        .then(() => {
-                            console.log(`✅ Сообщение отправлено в: ${collection}`);
-                            chatInput.value = '';
-                            showNotification('Сообщение отправлено!', 'success');
-                            scrollToBottom();
-                            chatSendBtn.disabled = false;
-                            chatSendBtn.classList.remove('sending');
-                        })
-                        .catch(error => {
-                            console.error(`❌ Ошибка отправки в ${collection}:`, error);
-                            trySend(index + 1);
-                        });
-                };
-                
-                trySend(0);
+                    });
             }
             
             function scrollToBottom() {
