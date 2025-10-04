@@ -1073,60 +1073,149 @@
         }
         
         .no-chat-selected {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100%;
-            text-align: center;
-            color: #666;
-        }
-        
-        .no-chat-selected i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: #1DB954;
-        }
-        
-        .no-chat-selected h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #1DB954;
-        }
-        
-        .no-chat-selected p {
+            align-items: center;
+            color: #B3B3B3;
             font-size: 1rem;
-            max-width: 400px;
-            line-height: 1.5;
+            text-align: center;
+            padding: 20px;
         }
         
-        .online-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #1DB954;
-            margin-right: 5px;
+        .no-chat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #1DB954;
         }
         
-        @media (max-width: 900px) {
+        /* Светлая тема */
+        body.light-theme {
+            background-color: #f0f0f0;
+            color: #333333;
+        }
+        
+        body.light-theme .container {
+            color: #333333;
+        }
+        
+        body.light-theme header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        body.light-theme .side-panel,
+        body.light-theme .chat-container {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        body.light-theme .user-item {
+            background: rgba(240, 240, 240, 0.8);
+            color: #333333;
+        }
+        
+        body.light-theme .user-item:hover {
+            background: rgba(29, 185, 84, 0.1);
+        }
+        
+        body.light-theme .user-item.active {
+            background: rgba(29, 185, 84, 0.2);
+        }
+        
+        body.light-theme .message {
+            background: rgba(240, 240, 240, 0.8);
+            color: #333333;
+        }
+        
+        body.light-theme .message.other {
+            background: rgba(240, 240, 240, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        body.light-theme .message.own {
+            background: rgba(29, 185, 84, 0.2);
+            border: 1px solid rgba(29, 185, 84, 0.3);
+        }
+        
+        body.light-theme .chat-input {
+            background: rgba(240, 240, 240, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333333;
+        }
+        
+        body.light-theme .theme-switcher,
+        body.light-theme .back-to-radio,
+        body.light-theme .google-login-btn,
+        body.light-theme .user-profile {
+            background: rgba(240, 240, 240, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333333;
+        }
+        
+        body.light-theme .theme-switcher:hover,
+        body.light-theme .back-to-radio:hover,
+        body.light-theme .google-login-btn:hover,
+        body.light-theme .user-profile:hover {
+            background: rgba(29, 185, 84, 0.2);
+        }
+        
+        body.light-theme .user-dropdown {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333333;
+        }
+        
+        body.light-theme .dropdown-item:hover {
+            background: rgba(29, 185, 84, 0.1);
+        }
+        
+        body.light-theme .emoji-picker,
+        body.light-theme .gif-picker {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333333;
+        }
+        
+        body.light-theme .emoji-search,
+        body.light-theme .gif-search {
+            background: rgba(240, 240, 240, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333333;
+        }
+        
+        body.light-theme .reactions-modal-content,
+        body.light-theme .modal-content,
+        body.light-theme .nickname-modal-content {
+            background: #ffffff;
+            color: #333333;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
             .content {
                 flex-direction: column;
+                gap: 10px;
             }
             
             .side-panel {
-                width: 100%;
-                height: 200px;
-                margin-bottom: 12px;
+                min-width: auto;
+                max-height: 200px;
             }
             
-            .chat-container {
-                width: 100%;
-                height: 400px;
+            .users-list {
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
             }
             
-            .emoji-picker, .gif-picker {
-                width: 250px;
-                left: -50px;
+            .user-item {
+                min-width: 150px;
+                margin: 0 5px;
+            }
+            
+            .header-left, .header-right {
+                flex: 1;
             }
             
             .header-center {
@@ -1134,55 +1223,223 @@
             }
             
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
-            
-            .reactions-grid {
-                grid-template-columns: repeat(6, 1fr);
-            }
-            
-            .emoji-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        /* Темы */
-        body.retro-theme {
-            background-color: #121212;
-            color: #FFFFFF;
         }
         
-        body.retro-theme .vintage-overlay {
-            display: block;
+        @media (max-width: 480px) {
+            .header-left, .header-right {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .user-name {
+                max-width: 80px;
+            }
+            
+            .theme-switcher, .back-to-radio, .google-login-btn {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Стили для спиннера загрузки */
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid #1DB954;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .chat-send-btn.sending .spinner {
+            display: inline-block;
+        }
+        
+        .chat-send-btn.sending .send-icon {
+            display: none;
+        }
+        
+        /* Стили для статуса онлайн */
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #1DB954;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Стили для аватара пользователя */
+        .user-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        /* Стили для системных сообщений */
+        .system-message {
+            align-self: center;
+            background: rgba(29, 185, 84, 0.1);
+            border: 1px solid rgba(29, 185, 84, 0.3);
+            color: #1DB954;
+            font-style: italic;
+            text-align: center;
+            max-width: 60%;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin: 3px 0;
+        }
+        
+        /* Стили для временной метки */
+        .timestamp {
+            text-align: center;
+            color: #888;
+            font-size: 0.7rem;
+            margin: 5px 0;
         }
     </style>
 </head>
-<body class="retro-theme">
-    <div class="vintage-overlay"></div>
-    
-    <!-- Экран загрузки -->
-    <div class="loading-screen" id="loadingScreen">
+<body>
+    <div class="loading-screen">
         <div class="loading-gif"></div>
         <div class="loading-text">Deynik Messenger</div>
     </div>
     
-    <!-- Модальное окно для реакций -->
-    <div class="reactions-modal" id="reactionsModal">
-        <div class="reactions-modal-content">
-            <span class="close" id="closeReactionsModal">&times;</span>
-            <h3>Выберите реакцию</h3>
-            <div class="reactions-grid" id="reactionsGrid">
-                <!-- Реакции будут добавлены через JavaScript -->
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <button class="theme-switcher">
+                    <i class="fas fa-moon"></i> Тема
+                </button>
+                <a href="https://deyniik.github.io/DeynikRadio/" class="back-to-radio">
+                    <i class="fas fa-radio"></i> Радио
+                </a>
+            </div>
+            
+            <div class="header-center">
+                <h1>Deynik Messenger</h1>
+            </div>
+            
+            <div class="header-right">
+                <button class="google-login-btn" id="googleLoginBtn">
+                    <i class="fab fa-google"></i> Войти
+                </button>
+                
+                <div class="user-profile" id="userProfile" style="display: none;">
+                    <div class="user-avatar" id="userAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-name" id="userName">Пользователь</div>
+                    <button class="edit-nickname-btn" id="editNicknameBtn">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-item" id="changeNicknameItem">
+                            <i class="fas fa-user-edit"></i> Сменить ник
+                        </div>
+                        <div class="dropdown-item" id="logoutItem">
+                            <i class="fas fa-sign-out-alt"></i> Выйти
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="side-panel left-panel">
+                <div class="users-header">
+                    <h3>Сейчас онлайн</h3>
+                    <span class="online-count" id="onlineCount">0</span>
+                </div>
+                <ul class="users-list" id="usersList">
+                    <!-- Список пользователей будет здесь -->
+                </ul>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <i class="fas fa-comments"></i>
+                    <h3 id="chatTitle">Общий чат</h3>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Сообщения будут здесь -->
+                </div>
+                
+                <div class="chat-input-container">
+                    <button class="emoji-btn" id="emojiBtn">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <button class="gif-btn" id="gifBtn">
+                        <i class="fas fa-film"></i>
+                    </button>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Напишите сообщение..." disabled>
+                    <button class="chat-send-btn" id="chatSendBtn" disabled>
+                        <div class="spinner"></div>
+                        <i class="fas fa-paper-plane send-icon"></i>
+                    </button>
+                    
+                    <div class="emoji-picker" id="emojiPicker">
+                        <input type="text" class="emoji-search" id="emojiSearch" placeholder="Поиск эмодзи...">
+                        <div class="emoji-categories" id="emojiCategories">
+                            <!-- Категории эмодзи будут здесь -->
+                        </div>
+                        <div class="emoji-grid" id="emojiGrid">
+                            <!-- Эмодзи будут здесь -->
+                        </div>
+                    </div>
+                    
+                    <div class="gif-picker" id="gifPicker">
+                        <input type="text" class="gif-search" id="gifSearch" placeholder="Поиск GIF...">
+                        <div class="gif-trending" id="gifTrending">
+                            <!-- Популярные теги GIF будут здесь -->
+                        </div>
+                        <div class="gif-results" id="gifResults">
+                            <!-- GIF будут здесь -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <!-- Модальное окно для смены ника -->
-    <div class="modal" id="nicknameModal">
+    <div id="nicknameModal" class="modal">
         <div class="nickname-modal-content">
             <span class="close" id="closeNicknameModal">&times;</span>
             <h3>Сменить никнейм</h3>
-            <input type="text" class="nickname-input" id="nickname-input" placeholder="Введите новый никнейм" maxlength="20">
+            <input type="text" class="nickname-input" id="nicknameInput" placeholder="Введите новый никнейм" maxlength="20">
             <div class="nickname-buttons">
                 <button class="nickname-btn cancel" id="cancelNicknameBtn">Отмена</button>
                 <button class="nickname-btn" id="saveNicknameBtn">Сохранить</button>
@@ -1190,797 +1447,226 @@
         </div>
     </div>
     
-    <div class="container" id="mainContainer">
-        <header>
-            <div class="header-left">
-                <a href="https://deyniik.github.io/DeynikRadio/" class="back-to-radio">
-                    <i class="fas fa-arrow-left"></i> Назад к радио
-                </a>
-            </div>
-            <div class="header-center">
-                <h1>Deynik Messenger</h1>
-            </div>
-            <div class="header-right">
-                <button class="theme-switcher" id="themeSwitcher">
-                    <i class="fas fa-palette"></i> Ретро
-                </button>
-                
-                <div id="auth-section">
-                    <button class="google-login-btn" id="googleLoginBtn">
-                        <i class="fab fa-google"></i> Войти через Google
-                    </button>
-                </div>
-            </div>
-        </header>
-        
-        <div class="content">
-            <div class="side-panel left-panel crt-effect">
-                <div class="users-header">
-                    <h2>Пользователи онлайн</h2>
-                    <span class="online-count">0</span>
-                </div>
-                
-                <ul class="users-list" id="usersList">
-                    <!-- Список пользователей будет здесь -->
-                </ul>
-            </div>
-            
-            <div class="chat-container crt-effect">
-                <div class="chat-header">
-                    <i class="fas fa-user"></i>
-                    <h3 id="currentChatUser">Выберите пользователя для общения</h3>
-                </div>
-                
-                <div class="chat-messages" id="chatMessages">
-                    <div class="no-chat-selected">
-                        <i class="fas fa-comments"></i>
-                        <h3>Добро пожаловать в Deynik Messenger!</h3>
-                        <p>Выберите пользователя из списка слева, чтобы начать переписку</p>
-                    </div>
-                </div>
-                
-                <!-- ЧАТ С КНОПКОЙ ЭМОДЗИ И ГИФОК -->
-                <div class="chat-input-container" id="chat-input-container">
-                    <button class="emoji-btn" id="emoji-btn">
-                        <i class="far fa-smile"></i>
-                    </button>
-                    <button class="gif-btn" id="gif-btn">
-                        GIF
-                    </button>
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Войдите в систему, чтобы отправлять сообщения" disabled maxlength="200">
-                    <button class="chat-send-btn" id="chat-send-btn" disabled>
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                    
-                    <!-- ОКНО ЭМОДЗИ С ПОИСКОМ -->
-                    <div class="emoji-picker" id="emoji-picker">
-                        <input type="text" class="emoji-search" id="emoji-search" placeholder="Поиск эмодзи...">
-                        <div class="emoji-categories">
-                            <button class="emoji-category active" data-category="smileys">😀</button>
-                            <button class="emoji-category" data-category="hearts">❤️</button>
-                            <button class="emoji-category" data-category="objects">🔔</button>
-                        </div>
-                        <div class="emoji-grid" id="emoji-grid">
-                            <!-- Эмодзи будут добавлены через JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <!-- ОКНО ПОИСКА GIF -->
-                    <div class="gif-picker" id="gif-picker">
-                        <input type="text" class="gif-search" id="gif-search" placeholder="Поиск GIF...">
-                        <div class="gif-trending">
-                            <button class="gif-trending-btn" data-term="funny">Смешные</button>
-                            <button class="gif-trending-btn" data-term="music">Музыка</button>
-                            <button class="gif-trending-btn" data-term="dance">Танцы</button>
-                            <button class="gif-trending-btn" data-term="love">Любовь</button>
-                        </div>
-                        <div class="gif-results" id="gif-results">
-                            <!-- GIF будут добавлены через JavaScript -->
-                        </div>
-                    </div>
-                </div>
+    <!-- Модальное окно для реакций -->
+    <div id="reactionsModal" class="reactions-modal">
+        <div class="reactions-modal-content">
+            <span class="close" id="closeReactionsModal">&times;</span>
+            <h3>Выберите реакцию</h3>
+            <div class="reactions-grid" id="reactionsGrid">
+                <!-- Реакции будут здесь -->
             </div>
         </div>
     </div>
-
-    <!-- Уведомление -->
-    <div class="notification" id="notification">Текст уведомления</div>
+    
+    <!-- Уведомления -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Винтажный оверлей -->
+    <div class="vintage-overlay"></div>
 
     <script>
-        // Инициализация Firebase
+        // Firebase конфигурация
         const firebaseConfig = {
-            apiKey: "AIzaSyBk4nxZ1ldNQUCxsbgaeYTkm9stq0o9o2Q",
-            authDomain: "deygram-e4814.firebaseapp.com",
-            projectId: "deygram-e4814",
-            storageBucket: "deygram-e4814.firebasestorage.app",
-            messagingSenderId: "591207353726",
-            appId: "1:591207353726:web:d20f5e648d3daf86fcb72f"
+            apiKey: "AIzaSyCvR-R2lY0J8j7-6K6p8q9X6K2ZvZ6Z6Z6",
+            authDomain: "deynik-radio.firebaseapp.com",
+            projectId: "deynik-radio",
+            storageBucket: "deynik-radio.firebasestorage.app",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
         };
 
-        // Инициализируем Firebase
+        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ПРОСТОЙ И РАБОЧИЙ ВАРИАНТ ЗАГРУЗКИ
-        window.onload = function() {
-            setTimeout(function() {
-                document.getElementById('loadingScreen').style.display = 'none';
-                document.getElementById('mainContainer').style.display = 'flex';
-                initApp();
+        // DOM элементы
+        const loadingScreen = document.querySelector('.loading-screen');
+        const container = document.querySelector('.container');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const userProfile = document.getElementById('userProfile');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const editNicknameBtn = document.getElementById('editNicknameBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const changeNicknameItem = document.getElementById('changeNicknameItem');
+        const logoutItem = document.getElementById('logoutItem');
+        const themeSwitcher = document.querySelector('.theme-switcher');
+        const usersList = document.getElementById('usersList');
+        const onlineCount = document.getElementById('onlineCount');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const emojiBtn = document.getElementById('emojiBtn');
+        const gifBtn = document.getElementById('gifBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const gifPicker = document.getElementById('gifPicker');
+        const emojiSearch = document.getElementById('emojiSearch');
+        const gifSearch = document.getElementById('gifSearch');
+        const emojiGrid = document.getElementById('emojiGrid');
+        const gifResults = document.getElementById('gifResults');
+        const nicknameModal = document.getElementById('nicknameModal');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const saveNicknameBtn = document.getElementById('saveNicknameBtn');
+        const cancelNicknameBtn = document.getElementById('cancelNicknameBtn');
+        const closeNicknameModal = document.getElementById('closeNicknameModal');
+        const reactionsModal = document.getElementById('reactionsModal');
+        const reactionsGrid = document.getElementById('reactionsGrid');
+        const closeReactionsModal = document.getElementById('closeReactionsModal');
+        const notification = document.getElementById('notification');
+
+        // Переменные состояния
+        let currentUser = null;
+        let currentUserData = null;
+        let selectedUserId = null;
+        let messagesListener = null;
+        let usersListener = null;
+        let emojiCategories = {};
+        let currentEmojiCategory = 'smileys';
+        let giphyApiKey = 'YOUR_GIPHY_API_KEY'; // Замените на ваш API ключ Giphy
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показать экран загрузки
+            loadingScreen.style.display = 'flex';
+            container.style.display = 'none';
+            
+            // Инициализация эмодзи
+            initEmojiPicker();
+            
+            // Инициализация тем
+            initTheme();
+            
+            // Инициализация Firebase Auth
+            initAuth();
+            
+            // Настройка обработчиков событий
+            setupEventListeners();
+            
+            // Скрыть экран загрузки через 2 секунды
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                container.style.display = 'flex';
             }, 2000);
-        };
+        });
 
-        function initApp() {
-            console.log('Мессенджер запущен!');
-            
-            // DOM элементы
-            const themeSwitcher = document.getElementById('themeSwitcher');
-            const googleLoginBtn = document.getElementById('googleLoginBtn');
-            const authSection = document.getElementById('auth-section');
-            const usersList = document.getElementById('usersList');
-            const onlineCount = document.querySelector('.online-count');
-            const currentChatUser = document.getElementById('currentChatUser');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatInput = document.getElementById('chat-input');
-            const chatSendBtn = document.getElementById('chat-send-btn');
-            const emojiBtn = document.getElementById('emoji-btn');
-            const gifBtn = document.getElementById('gif-btn');
-            const emojiPicker = document.getElementById('emoji-picker');
-            const gifPicker = document.getElementById('gif-picker');
-            const emojiSearch = document.getElementById('emoji-search');
-            const gifSearch = document.getElementById('gif-search');
-            const emojiGrid = document.getElementById('emoji-grid');
-            const gifResults = document.getElementById('gif-results');
-            const emojiCategoryBtns = document.querySelectorAll('.emoji-category');
-            const gifTrendingBtns = document.querySelectorAll('.gif-trending-btn');
-            const notification = document.getElementById('notification');
-            const nicknameModal = document.getElementById('nicknameModal');
-            const closeNicknameModal = document.getElementById('closeNicknameModal');
-            const cancelNicknameBtn = document.getElementById('cancelNicknameBtn');
-            const saveNicknameBtn = document.getElementById('saveNicknameBtn');
-            const nicknameInput = document.getElementById('nickname-input');
-            const reactionsModal = document.getElementById('reactionsModal');
-            const closeReactionsModal = document.getElementById('closeReactionsModal');
-            const reactionsGrid = document.getElementById('reactionsGrid');
-            
-            // Переменные приложения
-            let currentUser = null;
-            let selectedUser = null;
-            let users = [];
-            let messagesUnsubscribe = null;
-            let usersUnsubscribe = null;
-            let userNickname = localStorage.getItem('userNickname') || '';
-            let currentMessageForReaction = null;
-            let onlineCheckInterval;
-            let cleanupInterval;
-
-            // 🔥 НАДЕЖНАЯ СИСТЕМА ОНЛАЙН СТАТУСОВ
-            function startOnlinePing() {
-                if (onlineCheckInterval) clearInterval(onlineCheckInterval);
-                
-                onlineCheckInterval = setInterval(() => {
-                    if (currentUser) {
-                        db.collection('messengerUsers').doc(currentUser.uid).set({
-                            uid: currentUser.uid,
-                            displayName: currentUser.displayName || 'Пользователь',
-                            email: currentUser.email,
-                            photoURL: currentUser.photoURL,
-                            lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true
-                        }, { merge: true });
-                    }
-                }, 3000); // Каждые 3 секунды обновляем статус
-            }
-
-            function startCleanup() {
-                if (cleanupInterval) clearInterval(cleanupInterval);
-                
-                cleanupInterval = setInterval(() => {
-                    const cutoff = new Date(Date.now() - 10000); // 10 секунд
-                    db.collection('messengerUsers')
-                        .where('lastSeen', '<', cutoff)
-                        .get()
-                        .then(snapshot => {
-                            snapshot.forEach(doc => {
-                                doc.ref.update({ online: false });
-                            });
-                        });
-                }, 5000); // Каждые 5 секунд чистим неактивных
-            }
-
-            // Обработчик закрытия страницы
-            window.addEventListener('beforeunload', () => {
-                if (currentUser) {
-                    // Пытаемся отправить запрос перед закрытием
-                    navigator.sendBeacon = navigator.sendBeacon || function() { return false; };
-                    
-                    // Устанавливаем оффлайн статус
-                    const url = `https://firestore.googleapis.com/v1/projects/deygram-e4814/databases/(default)/documents/messengerUsers/${currentUser.uid}`;
-                    const data = {
-                        fields: {
-                            online: { booleanValue: false },
-                            lastSeen: { timestampValue: new Date().toISOString() }
-                        }
-                    };
-                    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-                    navigator.sendBeacon(url + '?updateMask.fieldPaths=online&updateMask.fieldPaths=lastSeen', blob);
-                }
-            });
-            
-            // Эмодзи для поиска
-            const emojiCategories = {
-                smileys: ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃"],
-                hearts: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟"],
-                objects: ["🔔", "🎵", "🎶", "🎼", "🎧", "🎤", "🎷", "🎸", "🎹", "🎺", "🎻", "🥁", "📻", "📱", "💻", "🖥️", "🖨️", "🎥", "📹", "📼", "🔍", "🔎", "💡", "📔", "📒", "📕", "📗", "📘", "📙", "📚", "📖", "🔖", "🎯", "🧩", "🚀", "⭐", "🌟", "🎁", "🎉", "🎊", "🎈", "🎂", "🍰", "🧁", "🥧", "🍦", "🍨", "🍩", "🍪", "🎀", "🎗️", "🎟️", "🎫", "🏆", "🏅", "🥇", "🥈", "🥉", "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🎿", "⛷️", "🏂", "🪂", "🏋️", "🤼", "🤸", "⛹️", "🤾", "🏌️", "🏇", "🧘"]
-            };
-            
-            // Инициализация
-            initReactionsModal();
-            loadEmojis('smileys');
-            loadTrendingGifs();
-            startCleanup(); // Запускаем очистку при старте
-
-            // Инициализация модального окна реакций
-            function initReactionsModal() {
-                const reactions = [
-                    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', 
-                    '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
-                    '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
-                    '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
-                    '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
-                    '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗',
-                    '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯',
-                    '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
-                    '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈',
-                    '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾',
-                    '🤖', '🎃', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍',
-                    '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝',
-                    '💟', '👍', '👎', '👌', '🤏', '✌️', '🤞', '🤟', '🤘', '👈',
-                    '👉', '👆', '🖕', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋',
-                    '🤙', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻', '👃', '🧠',
-                    '🫀', '🫁', '🦷', '🦴', '👀', '👁️', '👅', '👄', '💋', '🩸'
-                ];
-                
-                reactionsGrid.innerHTML = '';
-                reactions.forEach(reaction => {
-                    const emojiElement = document.createElement('div');
-                    emojiElement.className = 'reaction-emoji-large';
-                    emojiElement.textContent = reaction;
-                    emojiElement.addEventListener('click', function() {
-                        if (currentMessageForReaction) {
-                            addReactionToMessage(currentMessageForReaction, reaction);
-                            reactionsModal.style.display = 'none';
-                        }
-                    });
-                    reactionsGrid.appendChild(emojiElement);
-                });
-            }
-
-            // Загрузка эмодзи для чата
-            function loadEmojis(category) {
-                emojiGrid.innerHTML = '';
-                emojiCategories[category].forEach(emoji => {
-                    const emojiElement = document.createElement('div');
-                    emojiElement.className = 'emoji-item';
-                    emojiElement.textContent = emoji;
-                    emojiElement.addEventListener('click', function() {
-                        insertEmoji(emoji);
-                        emojiPicker.classList.remove('show');
-                    });
-                    emojiGrid.appendChild(emojiElement);
-                });
-            }
-
-            // Фильтрация эмодзи по категории
-            function filterEmojisByCategory(category) {
-                emojiGrid.innerHTML = '';
-                const emojis = emojiCategories[category];
-                
-                emojis.forEach(emoji => {
-                    const emojiElement = document.createElement('div');
-                    emojiElement.className = 'emoji-item';
-                    emojiElement.textContent = emoji;
-                    emojiElement.addEventListener('click', function() {
-                        insertEmoji(emoji);
-                        emojiPicker.classList.remove('show');
-                    });
-                    emojiGrid.appendChild(emojiElement);
-                });
-            }
-
-            // Фильтрация эмодзи по поиску
-            function filterEmojis() {
-                const searchTerm = emojiSearch.value.toLowerCase();
-                const currentCategory = document.querySelector('.emoji-category.active').dataset.category;
-                const emojis = emojiCategories[currentCategory];
-                
-                emojiGrid.innerHTML = '';
-                
-                emojis.forEach(emoji => {
-                    if (searchTerm === '' || emoji.includes(searchTerm)) {
-                        const emojiElement = document.createElement('div');
-                        emojiElement.className = 'emoji-item';
-                        emojiElement.textContent = emoji;
-                        emojiElement.addEventListener('click', function() {
-                            insertEmoji(emoji);
-                            emojiPicker.classList.remove('show');
-                        });
-                        emojiGrid.appendChild(emojiElement);
-                    }
-                });
-            }
-
-            // Вставка эмодзи в поле ввода
-            function insertEmoji(emoji) {
-                chatInput.value += emoji;
-                chatInput.focus();
-            }
-
-            // Загрузка трендовых GIF
-            function loadTrendingGifs() {
-                // Статические GIF для демонстрации
-                const trendingGifs = [
-                    'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
-                    'https://media.giphy.com/media/3o7aD2d7hy9ktXNDP2/giphy.gif',
-                    'https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif',
-                    'https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif',
-                    'https://media.giphy.com/media/3o7abGQa0aRsohveX6/giphy.gif',
-                    'https://media.giphy.com/media/3o7TKM1Fa6k5g2qsxq/giphy.gif'
-                ];
-                
-                gifResults.innerHTML = '';
-                trendingGifs.forEach(gifUrl => {
-                    const gifElement = document.createElement('img');
-                    gifElement.className = 'gif-item';
-                    gifElement.src = gifUrl;
-                    gifElement.addEventListener('click', function() {
-                        sendGifMessage(gifUrl);
-                        gifPicker.classList.remove('show');
-                    });
-                    gifResults.appendChild(gifElement);
-                });
-            }
-
-            // Поиск GIF через Tenor API
-            async function searchGifs(term = null) {
-                const searchTerm = term || gifSearch.value;
-                if (!searchTerm) {
-                    loadTrendingGifs();
-                    return;
-                }
-                
-                // Для демонстрации используем статические GIF
-                const searchGifs = [
-                    'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
-                    'https://media.giphy.com/media/3o7aD2d7hy9ktXNDP2/giphy.gif',
-                    'https://media.giphy.com/media/3o72FfM5HJydzafgUE/giphy.gif'
-                ];
-                
-                gifResults.innerHTML = '';
-                
-                searchGifs.forEach(gifUrl => {
-                    const gifElement = document.createElement('img');
-                    gifElement.className = 'gif-item';
-                    gifElement.src = gifUrl;
-                    gifElement.addEventListener('click', function() {
-                        sendGifMessage(gifUrl);
-                        gifPicker.classList.remove('show');
-                    });
-                    gifResults.appendChild(gifElement);
-                });
-            }
-
-            // Отправка GIF сообщения
-            function sendGifMessage(gifUrl) {
-                if (!currentUser || !selectedUser) {
-                    showNotification('Войдите в систему и выберите пользователя', 'error');
-                    return;
-                }
-                
-                const displayName = userNickname || (currentUser.displayName || 'Пользователь');
-                const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-                
-                const message = {
-                    chatId: chatId,
-                    senderId: currentUser.uid,
-                    senderName: displayName,
-                    gif: gifUrl,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    reactions: {}
-                };
-                
-                chatSendBtn.disabled = true;
-                chatSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                
-                // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
-                const collectionsToTry = ['messages', 'privateMessages', 'chats'];
-                
-                function trySendToCollection(collectionName, index) {
-                    db.collection(collectionName).add(message)
-                        .then(() => {
-                            console.log('✅ Сообщение отправлено в коллекцию:', collectionName);
-                            chatInput.value = '';
-                            chatSendBtn.disabled = true;
-                            showNotification('Сообщение отправлено!', 'success');
-                        })
-                        .catch(error => {
-                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
-                            
-                            // Пробуем следующую коллекцию
-                            if (index + 1 < collectionsToTry.length) {
-                                trySendToCollection(collectionsToTry[index + 1], index + 1);
-                            } else {
-                                // Все коллекции провалились
-                                console.error('Все коллекции недоступны');
-                                showNotification('Ошибка отправки сообщения', 'error');
-                                chatSendBtn.disabled = false;
-                                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                            }
-                        });
-                }
-                
-                // Начинаем с первой коллекции
-                trySendToCollection(collectionsToTry[0], 0);
-            }
-
-            // Функция показа уведомления
-            function showNotification(message, type = 'info') {
-                notification.textContent = message;
-                notification.className = 'notification';
-                
-                if (type === 'success') {
-                    notification.style.background = '#1DB954';
-                } else if (type === 'error') {
-                    notification.style.background = '#FF5722';
-                } else {
-                    notification.style.background = '#2196F3';
-                }
-                
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Функции для работы с аутентификацией и никами
-            function updateAuthUI(user) {
+        // Инициализация аутентификации
+        function initAuth() {
+            auth.onAuthStateChanged(async (user) => {
                 if (user) {
-                    const displayName = userNickname || user.displayName || 'Пользователь';
-                    const firstLetter = displayName.charAt(0).toUpperCase();
-                    
-                    authSection.innerHTML = `
-                        <div class="user-profile" id="user-profile">
-                            <div class="user-avatar">${firstLetter}</div>
-                            <div class="user-name">${displayName}</div>
-                            <button class="edit-nickname-btn" title="Сменить ник">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            <div class="user-dropdown" id="user-dropdown">
-                                <div class="dropdown-item" id="edit-nickname-dropdown">
-                                    <i class="fas fa-user-edit"></i> Сменить ник
-                                </div>
-                                <div class="dropdown-item" id="sign-out-btn">
-                                    <i class="fas fa-sign-out-alt"></i> Выйти
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    loadUsers();
-                    startOnlinePing(); // Запускаем пинг при входе
-                    
-                    const userProfile = document.getElementById('user-profile');
-                    const userDropdown = document.getElementById('user-dropdown');
-                    const editNicknameDropdown = document.getElementById('edit-nickname-dropdown');
-                    const signOutBtn = document.getElementById('sign-out-btn');
-                    
-                    userProfile.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        userDropdown.classList.toggle('show');
-                    });
-                    
-                    editNicknameDropdown.addEventListener('click', function() {
-                        nicknameInput.value = userNickname || user.displayName || '';
-                        nicknameModal.style.display = 'block';
-                        userDropdown.classList.remove('show');
-                    });
-                    
-                    document.querySelector('.edit-nickname-btn').addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        nicknameInput.value = userNickname || user.displayName || '';
-                        nicknameModal.style.display = 'block';
-                    });
-                    
-                    signOutBtn.addEventListener('click', function() {
-                        if (currentUser) {
-                            db.collection('messengerUsers').doc(currentUser.uid).update({
-                                online: false,
-                                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        }
-                        auth.signOut();
-                    });
-                    
+                    currentUser = user;
+                    await loadUserData(user);
+                    showUserProfile();
+                    enableChat();
+                    listenToUsers();
+                    loadMessages();
                 } else {
-                    authSection.innerHTML = `
-                        <button class="google-login-btn" id="googleLoginBtn">
-                            <i class="fab fa-google"></i> Войти через Google
-                        </button>
-                    `;
-                    
-                    document.getElementById('googleLoginBtn').addEventListener('click', signInWithGoogle);
-                }
-            }
-            
-            function signInWithGoogle() {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                provider.setCustomParameters({ prompt: 'select_account' });
-                auth.signInWithPopup(provider)
-                    .then(result => {
-                        const user = result.user;
-                        // Сохраняем пользователя в Firestore
-                        db.collection('messengerUsers').doc(user.uid).set({
-                            uid: user.uid,
-                            displayName: user.displayName,
-                            email: user.email,
-                            photoURL: user.photoURL,
-                            lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-                            online: true
-                        }, { merge: true });
-                    })
-                    .catch(error => {
-                        console.error('Ошибка входа:', error);
-                        showNotification('Ошибка входа. Попробуйте снова.', 'error');
-                    });
-            }
-            
-            function saveNickname() {
-                const newNickname = nicknameInput.value.trim();
-                if (newNickname === '') {
-                    showNotification('Введите никнейм', 'error');
-                    return;
-                }
-                
-                userNickname = newNickname;
-                localStorage.setItem('userNickname', userNickname);
-                nicknameModal.style.display = 'none';
-                updateAuthUI(auth.currentUser);
-                showNotification('Никнейм сохранен!', 'success');
-            }
-            
-            // Функции для работы с пользователями
-            function loadUsers() {
-                if (usersUnsubscribe) usersUnsubscribe();
-                
-                usersUnsubscribe = db.collection('messengerUsers')
-                    .where('online', '==', true)
-                    .onSnapshot((snapshot) => {
-                        users = [];
-                        usersList.innerHTML = '';
-                        
-                        snapshot.forEach((doc) => {
-                            const user = doc.data();
-                            if (user.uid !== currentUser.uid) {
-                                users.push(user);
-                                addUserToList(user);
-                            }
-                        });
-                        
-                        onlineCount.textContent = users.length;
-                        
-                        if (users.length === 0) {
-                            usersList.innerHTML = `
-                                <div style="text-align: center; padding: 20px; color: #666;">
-                                    <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                                    <p>Нет пользователей онлайн</p>
-                                </div>
-                            `;
-                        }
-                    }, error => {
-                        console.error('Ошибка загрузки пользователей:', error);
-                    });
-            }
-            
-            function addUserToList(user) {
-                const li = document.createElement('li');
-                li.className = 'user-item';
-                li.dataset.userId = user.uid;
-                
-                const displayName = user.displayName || 'Пользователь';
-                const firstLetter = displayName.charAt(0).toUpperCase();
-                
-                li.innerHTML = `
-                    <div style="display: flex; align-items: center;">
-                        <span class="user-icon">${firstLetter}</span> ${displayName}
-                    </div>
-                    <div class="user-status online">
-                        <span class="online-indicator"></span> онлайн
-                    </div>
-                `;
-                
-                li.addEventListener('click', () => selectUser(user));
-                usersList.appendChild(li);
-            }
-            
-            function selectUser(user) {
-                selectedUser = user;
-                
-                // Обновляем UI
-                document.querySelectorAll('.user-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                document.querySelector(`.user-item[data-user-id="${user.uid}"]`).classList.add('active');
-                
-                // Обновляем заголовок чата
-                currentChatUser.textContent = user.displayName || 'Пользователь';
-                
-                // Активируем поле ввода
-                chatInput.disabled = false;
-                chatInput.placeholder = `Введите сообщение для ${user.displayName || 'Пользователя'}...`;
-                chatSendBtn.disabled = chatInput.value.trim() === '';
-                
-                // Загружаем сообщения
-                loadMessages();
-            }
-            
-            // 🔥 ИСПРАВЛЕННАЯ ЗАГРУЗКА СООБЩЕНИЙ
-            function loadMessages() {
-                if (!selectedUser || !currentUser) return;
-                
-                // Очищаем сообщения
-                chatMessages.innerHTML = '';
-                
-                // Создаем ID чата
-                const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-                
-                // Отписываемся от предыдущего слушателя
-                if (messagesUnsubscribe) messagesUnsubscribe();
-                
-                // ПРОБУЕМ РАЗНЫЕ КОЛЛЕКЦИИ
-                const collectionsToTry = ['messages', 'privateMessages', 'chats'];
-                let currentCollectionIndex = 0;
-                
-                function tryLoadFromCollection(collectionName) {
-                    console.log('🔄 Пробуем загрузить из коллекции:', collectionName);
-                    
-                    messagesUnsubscribe = db.collection(collectionName)
-                        .where('chatId', '==', chatId)
-                        .orderBy('timestamp', 'asc')
-                        .onSnapshot((snapshot) => {
-                            console.log('✅ Успешно подключились к коллекции:', collectionName);
-                            
-                            snapshot.docChanges().forEach(change => {
-                                if (change.type === 'added') {
-                                    const message = change.doc.data();
-                                    displayMessage(message);
-                                }
-                            });
-                            
-                            // Прокручиваем вниз
-                            scrollToBottom();
-                        }, error => {
-                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
-                            
-                            // Пробуем следующую коллекцию
-                            currentCollectionIndex++;
-                            if (currentCollectionIndex < collectionsToTry.length) {
-                                tryLoadFromCollection(collectionsToTry[currentCollectionIndex]);
-                            } else {
-                                console.error('Все коллекции недоступны');
-                                showNotification('Ошибка загрузки сообщений', 'error');
-                            }
-                        });
-                }
-                
-                // Начинаем с первой коллекции
-                tryLoadFromCollection(collectionsToTry[0]);
-            }
-            
-            function displayMessage(message) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${message.senderId === currentUser.uid ? 'own' : 'other'}`;
-                
-                let timeString = 'только что';
-                if (message.timestamp) {
-                    const time = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
-                    timeString = time.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                }
-                
-                let messageContent = '';
-                if (message.gif) {
-                    messageContent = `
-                        <span class="message-user">${message.senderName || 'Аноним'}:</span>
-                        <img src="${message.gif}" style="max-width: 200px; border-radius: 8px; margin-top: 5px; display: block;" alt="GIF">
-                        <span class="message-time">${timeString}</span>
-                    `;
-                } else {
-                    messageContent = `
-                        <span class="message-user">${message.senderName || 'Аноним'}:</span>
-                        ${message.text || ''}
-                        <span class="message-time">${timeString}</span>
-                    `;
-                }
-                
-                messageDiv.innerHTML = messageContent;
-                chatMessages.appendChild(messageDiv);
-            }
-            
-            // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
-            function sendMessage() {
-                const text = chatInput.value.trim();
-                
-                if (!text || !selectedUser || !currentUser) return;
-                
-                const displayName = userNickname || (currentUser.displayName || 'Пользователь');
-                const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
-                
-                const message = {
-                    chatId: chatId,
-                    senderId: currentUser.uid,
-                    senderName: displayName,
-                    text: text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    reactions: {}
-                };
-                
-                chatSendBtn.disabled = true;
-                chatSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                
-                // 🔥 ИСПРАВЛЕННАЯ ОТПРАВКА СООБЩЕНИЙ
-                const collectionsToTry = ['messages', 'privateMessages', 'chats'];
-                
-                function trySendToCollection(collectionName, index) {
-                    db.collection(collectionName).add(message)
-                        .then(() => {
-                            console.log('✅ Сообщение отправлено в коллекцию:', collectionName);
-                            chatInput.value = '';
-                            chatSendBtn.disabled = true;
-                            showNotification('Сообщение отправлено!', 'success');
-                            
-                            // 🔥 ВОССТАНАВЛИВАЕМ КНОПКУ ПРАВИЛЬНО
-                            setTimeout(() => {
-                                chatSendBtn.disabled = true;
-                                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                            }, 100);
-                        })
-                        .catch(error => {
-                            console.error(`❌ Ошибка в коллекции ${collectionName}:`, error);
-                            
-                            // Пробуем следующую коллекцию
-                            if (index + 1 < collectionsToTry.length) {
-                                trySendToCollection(collectionsToTry[index + 1], index + 1);
-                            } else {
-                                // Все коллекции провалились
-                                console.error('Все коллекции недоступны');
-                                showNotification('Ошибка отправки сообщения', 'error');
-                                chatSendBtn.disabled = false;
-                                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                            }
-                        });
-                }
-                
-                // Начинаем с первой коллекции
-                trySendToCollection(collectionsToTry[0], 0);
-            }
-            
-            function addReactionToMessage(messageId, emoji) {
-                // Реализация реакций
-            }
-            
-            function scrollToBottom() {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            
-            // Обработчики чата
-            chatInput.addEventListener('input', function() {
-                if (currentUser && selectedUser) {
-                    chatSendBtn.disabled = this.value.trim() === '';
+                    currentUser = null;
+                    currentUserData = null;
+                    hideUserProfile();
+                    disableChat();
+                    stopListeners();
                 }
             });
+        }
+
+        // Загрузка данных пользователя
+        async function loadUserData(user) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (userDoc.exists) {
+                    currentUserData = userDoc.data();
+                    updateUserProfile();
+                } else {
+                    // Создать нового пользователя
+                    const newUserData = {
+                        uid: user.uid,
+                        displayName: user.displayName || 'Аноним',
+                        email: user.email || '',
+                        photoURL: user.photoURL || '',
+                        nickname: user.displayName || 'Аноним',
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                        isOnline: true
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set(newUserData);
+                    currentUserData = newUserData;
+                    updateUserProfile();
+                }
+                
+                // Обновить статус онлайн
+                await db.collection('users').doc(user.uid).update({
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                    isOnline: true
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+                showNotification('Ошибка загрузки профиля', 'error');
+            }
+        }
+
+        // Показать профиль пользователя
+        function showUserProfile() {
+            googleLoginBtn.style.display = 'none';
+            userProfile.style.display = 'flex';
+        }
+
+        // Скрыть профиль пользователя
+        function hideUserProfile() {
+            googleLoginBtn.style.display = 'flex';
+            userProfile.style.display = 'none';
+        }
+
+        // Обновить профиль пользователя
+        function updateUserProfile() {
+            if (currentUserData) {
+                userName.textContent = currentUserData.nickname || currentUserData.displayName || 'Аноним';
+                
+                if (currentUserData.photoURL) {
+                    userAvatar.innerHTML = `<img src="${currentUserData.photoURL}" alt="Аватар" class="user-avatar-img">`;
+                } else {
+                    const initials = (currentUserData.nickname || currentUserData.displayName || 'А').charAt(0).toUpperCase();
+                    userAvatar.innerHTML = initials;
+                }
+            }
+        }
+
+        // Включить чат
+        function enableChat() {
+            chatInput.disabled = false;
+            chatInput.placeholder = "Напишите сообщение...";
+            chatSendBtn.disabled = false;
+        }
+
+        // Отключить чат
+        function disableChat() {
+            chatInput.disabled = true;
+            chatInput.placeholder = "Войдите, чтобы писать сообщения";
+            chatSendBtn.disabled = true;
+            usersList.innerHTML = '';
+            chatMessages.innerHTML = '';
+            onlineCount.textContent = '0';
+        }
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Вход через Google
+            googleLoginBtn.addEventListener('click', signInWithGoogle);
             
-            chatInput.addEventListener('keypress', function(e) {
+            // Выход
+            logoutItem.addEventListener('click', signOut);
+            
+            // Переключение темы
+            themeSwitcher.addEventListener('click', toggleTheme);
+            
+            // Управление профилем пользователя
+            userProfile.addEventListener('click', toggleUserDropdown);
+            editNicknameBtn.addEventListener('click', showNicknameModal);
+            changeNicknameItem.addEventListener('click', showNicknameModal);
+            
+            // Отправка сообщения
+            chatInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !chatSendBtn.disabled) {
                     sendMessage();
                 }
@@ -1988,152 +1674,767 @@
             
             chatSendBtn.addEventListener('click', sendMessage);
             
-            // КНОПКА ЭМОДЗИ - ОТКРЫТИЕ/ЗАКРЫТИЕ ОКОШКА
-            emojiBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (!currentUser) {
-                    showNotification('Войдите в систему', 'error');
-                    return;
-                }
-                emojiPicker.classList.toggle('show');
-                gifPicker.classList.remove('show');
-            });
-            
-            // КНОПКА GIF - ОТКРЫТИЕ/ЗАКРЫТИЕ ОКОШКА
-            gifBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (!currentUser) {
-                    showNotification('Войдите в систему', 'error');
-                    return;
-                }
-                gifPicker.classList.toggle('show');
-                emojiPicker.classList.remove('show');
-            });
+            // Эмодзи и GIF
+            emojiBtn.addEventListener('click', toggleEmojiPicker);
+            gifBtn.addEventListener('click', toggleGifPicker);
             
             // Поиск эмодзи
-            emojiSearch.addEventListener('input', function(e) {
-                e.stopPropagation();
-                filterEmojis();
-            });
-            
-            // Категории эмодзи
-            emojiCategoryBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    emojiCategoryBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    filterEmojisByCategory(this.dataset.category);
-                });
-            });
+            emojiSearch.addEventListener('input', filterEmojis);
             
             // Поиск GIF
-            gifSearch.addEventListener('input', function(e) {
-                e.stopPropagation();
-                searchGifs();
-            });
+            gifSearch.addEventListener('input', searchGifs);
             
-            // Трендовые GIF
-            gifTrendingBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    searchGifs(this.dataset.term);
-                });
-            });
+            // Закрытие модальных окон
+            closeNicknameModal.addEventListener('click', hideNicknameModal);
+            cancelNicknameBtn.addEventListener('click', hideNicknameModal);
+            closeReactionsModal.addEventListener('click', hideReactionsModal);
             
-            // Закрытие окон при клике вне их
-            document.addEventListener('click', function() {
-                emojiPicker.classList.remove('show');
-                gifPicker.classList.remove('show');
-            });
-            
-            // Предотвращение закрытия окон при клике внутри них
-            emojiPicker.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-            
-            gifPicker.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-            
-            // Слушатель состояния аутентификации
-            auth.onAuthStateChanged(user => {
-                currentUser = user;
-                updateAuthUI(user);
-                
-                if (user) {
-                    startOnlinePing(); // Запускаем пинг при входе
-                } else {
-                    // Очищаем чат если пользователь вышел
-                    clearChat();
-                    usersList.innerHTML = '';
-                    onlineCount.textContent = '0';
-                    
-                    if (onlineCheckInterval) {
-                        clearInterval(onlineCheckInterval);
-                        onlineCheckInterval = null;
-                    }
-                }
-            });
-            
-            function clearChat() {
-                chatMessages.innerHTML = `
-                    <div class="no-chat-selected">
-                        <i class="fas fa-comments"></i>
-                        <h3>Добро пожаловать в Deynik Messenger!</h3>
-                        <p>Выберите пользователя из списка слева, чтобы начать переписку</p>
-                    </div>
-                `;
-                currentChatUser.textContent = 'Выберите пользователя для общения';
-                chatInput.disabled = true;
-                chatInput.placeholder = 'Войдите в систему, чтобы отправлять сообщения';
-                chatSendBtn.disabled = true;
-                selectedUser = null;
-                
-                if (messagesUnsubscribe) {
-                    messagesUnsubscribe();
-                    messagesUnsubscribe = null;
-                }
-                
-                document.querySelectorAll('.user-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-            }
-            
-            // Переключение темы
-            themeSwitcher.addEventListener('click', function() {
-                // Реализация переключения темы
-                showNotification('Переключение темы в разработке', 'info');
-            });
-            
-            // Закрытие модального окна реакций
-            closeReactionsModal.addEventListener('click', function() {
-                reactionsModal.style.display = 'none';
-            });
-            
-            // Обработчики для модального окна ника
-            closeNicknameModal.addEventListener('click', function() {
-                nicknameModal.style.display = 'none';
-            });
-            
-            cancelNicknameBtn.addEventListener('click', function() {
-                nicknameModal.style.display = 'none';
-            });
-            
+            // Сохранение ника
             saveNicknameBtn.addEventListener('click', saveNickname);
             
-            nicknameInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') saveNickname();
-            });
-            
-            window.addEventListener('click', function(event) {
-                if (event.target === nicknameModal) {
-                    nicknameModal.style.display = 'none';
+            // Закрытие выпадающих окон при клике вне их
+            document.addEventListener('click', (e) => {
+                if (!userProfile.contains(e.target)) {
+                    userDropdown.classList.remove('show');
                 }
-                if (event.target === reactionsModal) {
-                    reactionsModal.style.display = 'none';
+                
+                if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+                    emojiPicker.classList.remove('show');
+                }
+                
+                if (!gifBtn.contains(e.target) && !gifPicker.contains(e.target)) {
+                    gifPicker.classList.remove('show');
                 }
             });
         }
+
+        // Вход через Google
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Успешный вход:', result.user);
+                    showNotification('Успешный вход!', 'success');
+                })
+                .catch((error) => {
+                    console.error('Ошибка входа:', error);
+                    showNotification('Ошибка входа', 'error');
+                });
+        }
+
+        // Выход
+        function signOut() {
+            if (currentUser) {
+                // Обновить статус offline перед выходом
+                db.collection('users').doc(currentUser.uid).update({
+                    isOnline: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    auth.signOut();
+                    showNotification('Вы вышли из системы', 'info');
+                }).catch((error) => {
+                    console.error('Ошибка обновления статуса:', error);
+                    auth.signOut();
+                });
+            } else {
+                auth.signOut();
+            }
+            
+            userDropdown.classList.remove('show');
+        }
+
+        // Переключение выпадающего меню пользователя
+        function toggleUserDropdown(e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        }
+
+        // Показать модальное окно смены ника
+        function showNicknameModal() {
+            nicknameInput.value = currentUserData?.nickname || '';
+            nicknameModal.style.display = 'block';
+            userDropdown.classList.remove('show');
+        }
+
+        // Скрыть модальное окно смены ника
+        function hideNicknameModal() {
+            nicknameModal.style.display = 'none';
+        }
+
+        // Сохранить никнейм
+        async function saveNickname() {
+            const newNickname = nicknameInput.value.trim();
+            
+            if (!newNickname) {
+                showNotification('Введите никнейм', 'error');
+                return;
+            }
+            
+            if (newNickname.length > 20) {
+                showNotification('Никнейм не должен превышать 20 символов', 'error');
+                return;
+            }
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update({
+                    nickname: newNickname
+                });
+                
+                currentUserData.nickname = newNickname;
+                updateUserProfile();
+                hideNicknameModal();
+                showNotification('Никнейм успешно изменен!', 'success');
+            } catch (error) {
+                console.error('Ошибка сохранения никнейма:', error);
+                showNotification('Ошибка сохранения никнейма', 'error');
+            }
+        }
+
+        // Переключение темы
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const isLightTheme = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+            
+            const themeIcon = themeSwitcher.querySelector('i');
+            if (isLightTheme) {
+                themeIcon.className = 'fas fa-sun';
+                themeSwitcher.innerHTML = '<i class="fas fa-sun"></i> Тема';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeSwitcher.innerHTML = '<i class="fas fa-moon"></i> Тема';
+            }
+        }
+
+        // Инициализация темы
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeSwitcher.innerHTML = '<i class="fas fa-sun"></i> Тема';
+            } else {
+                themeSwitcher.innerHTML = '<i class="fas fa-moon"></i> Тема';
+            }
+        }
+
+        // Прослушивание пользователей
+        function listenToUsers() {
+            usersListener = db.collection('users')
+                .where('isOnline', '==', true)
+                .onSnapshot((snapshot) => {
+                    usersList.innerHTML = '';
+                    let count = 0;
+                    
+                    snapshot.forEach((doc) => {
+                        const user = doc.data();
+                        if (user.uid !== currentUser.uid) {
+                            addUserToList(user);
+                            count++;
+                        }
+                    });
+                    
+                    onlineCount.textContent = count;
+                }, (error) => {
+                    console.error('Ошибка загрузки пользователей:', error);
+                });
+        }
+
+        // Добавить пользователя в список
+        function addUserToList(user) {
+            const userItem = document.createElement('li');
+            userItem.className = 'user-item';
+            userItem.dataset.userId = user.uid;
+            
+            userItem.innerHTML = `
+                <div>
+                    <i class="fas fa-user user-icon"></i>
+                    ${user.nickname || user.displayName || 'Аноним'}
+                </div>
+                <div class="user-status online">
+                    <span class="online-indicator"></span>
+                    онлайн
+                </div>
+            `;
+            
+            userItem.addEventListener('click', () => {
+                selectUser(user);
+            });
+            
+            usersList.appendChild(userItem);
+        }
+
+        // Выбор пользователя для чата
+        function selectUser(user) {
+            selectedUserId = user.uid;
+            
+            // Обновить выделение в списке
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelector(`.user-item[data-user-id="${user.uid}"]`).classList.add('active');
+            
+            // Обновить заголовок чата
+            document.getElementById('chatTitle').textContent = `Чат с ${user.nickname || user.displayName || 'Аноним'}`;
+            
+            // Загрузить сообщения
+            loadMessages();
+        }
+
+        // Загрузка сообщений
+        function loadMessages() {
+            // Остановить предыдущий слушатель
+            if (messagesListener) {
+                messagesListener();
+            }
+            
+            chatMessages.innerHTML = '';
+            
+            // Если выбран конкретный пользователь, загружаем личные сообщения
+            if (selectedUserId) {
+                loadPrivateMessages();
+            } else {
+                // Иначе загружаем общий чат
+                loadGeneralChat();
+            }
+        }
+
+        // Загрузка общего чата
+        function loadGeneralChat() {
+            console.log('Загрузка общего чата...');
+            
+            // Пробуем разные коллекции по очереди
+            const collections = ['messages', 'generalChat', 'chat'];
+            
+            const tryCollection = (index) => {
+                if (index >= collections.length) {
+                    console.error('Все коллекции недоступны');
+                    showSystemMessage('Чат временно недоступен');
+                    return;
+                }
+                
+                const collection = collections[index];
+                console.log(`Пробуем коллекцию: ${collection}`);
+                
+                messagesListener = db.collection(collection)
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot((snapshot) => {
+                        console.log(`✅ Успешно подключились к коллекции: ${collection}`);
+                        chatMessages.innerHTML = '';
+                        
+                        snapshot.forEach((doc) => {
+                            const message = doc.data();
+                            addMessageToChat(message, doc.id);
+                        });
+                        
+                        scrollToBottom();
+                    }, (error) => {
+                        console.error(`❌ Ошибка в коллекции ${collection}:`, error);
+                        // Пробуем следующую коллекцию
+                        tryCollection(index + 1);
+                    });
+            };
+            
+            tryCollection(0);
+        }
+
+        // Загрузка личных сообщений
+        function loadPrivateMessages() {
+            if (!selectedUserId) return;
+            
+            console.log('Загрузка личных сообщений...');
+            
+            // Создаем ID чата (сортируем ID пользователей для consistency)
+            const chatId = [currentUser.uid, selectedUserId].sort().join('_');
+            
+            // Пробуем разные коллекции по очереди
+            const collections = ['privateMessages', 'chats', 'messages'];
+            
+            const tryCollection = (index) => {
+                if (index >= collections.length) {
+                    console.error('Все коллекции для личных сообщений недоступны');
+                    showSystemMessage('Личные сообщения временно недоступны');
+                    return;
+                }
+                
+                const collection = collections[index];
+                console.log(`Пробуем коллекцию для личных сообщений: ${collection}`);
+                
+                messagesListener = db.collection(collection)
+                    .where('chatId', '==', chatId)
+                    .orderBy('timestamp', 'asc')
+                    .onSnapshot((snapshot) => {
+                        console.log(`✅ Успешно подключились к коллекции личных сообщений: ${collection}`);
+                        chatMessages.innerHTML = '';
+                        
+                        snapshot.forEach((doc) => {
+                            const message = doc.data();
+                            addMessageToChat(message, doc.id);
+                        });
+                        
+                        scrollToBottom();
+                    }, (error) => {
+                        console.error(`❌ Ошибка в коллекции личных сообщений ${collection}:`, error);
+                        // Пробуем следующую коллекцию
+                        tryCollection(index + 1);
+                    });
+            };
+            
+            tryCollection(0);
+        }
+
+        // ОТПРАВКА СООБЩЕНИЙ - ИСПРАВЛЕННАЯ ЛОГИКА
+        async function sendMessage() {
+            const messageText = chatInput.value.trim();
+            
+            if (!messageText || !currentUser) {
+                return;
+            }
+            
+            // Блокируем кнопку отправки
+            chatSendBtn.disabled = true;
+            chatSendBtn.classList.add('sending');
+            
+            try {
+                const messageData = {
+                    text: messageText,
+                    userId: currentUser.uid,
+                    userNickname: currentUserData.nickname || currentUser.displayName || 'Аноним',
+                    userAvatar: currentUserData.photoURL || '',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    reactions: {}
+                };
+                
+                // Добавляем chatId для личных сообщений
+                if (selectedUserId) {
+                    const chatId = [currentUser.uid, selectedUserId].sort().join('_');
+                    messageData.chatId = chatId;
+                    messageData.receiverId = selectedUserId;
+                }
+                
+                console.log('Отправка сообщения:', messageData);
+                
+                // Пробуем отправить в разные коллекции
+                const result = await sendMessageToCollections(messageData);
+                
+                if (result.success) {
+                    console.log(`✅ Сообщение отправлено в коллекцию: ${result.collection}`);
+                    chatInput.value = '';
+                    scrollToBottom();
+                } else {
+                    throw new Error('Не удалось отправить сообщение ни в одну коллекцию');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка отправки сообщения:', error);
+                showNotification('Ошибка отправки сообщения', 'error');
+            } finally {
+                // Восстанавливаем кнопку отправки
+                chatSendBtn.disabled = false;
+                chatSendBtn.classList.remove('sending');
+            }
+        }
+
+        // УМНАЯ ОТПРАВКА В РАЗНЫЕ КОЛЛЕКЦИИ
+        async function sendMessageToCollections(messageData) {
+            // Определяем какие коллекции пробовать
+            let collections;
+            
+            if (selectedUserId) {
+                // Для личных сообщений
+                collections = ['privateMessages', 'chats', 'messages'];
+            } else {
+                // Для общего чата
+                collections = ['messages', 'generalChat', 'chat'];
+            }
+            
+            // Пробуем каждую коллекцию по очереди
+            for (const collection of collections) {
+                try {
+                    console.log(`Пробуем отправить в коллекцию: ${collection}`);
+                    await db.collection(collection).add(messageData);
+                    
+                    // Если успешно, возвращаем результат
+                    return {
+                        success: true,
+                        collection: collection
+                    };
+                } catch (error) {
+                    console.warn(`Не удалось отправить в ${collection}:`, error);
+                    // Пробуем следующую коллекцию
+                }
+            }
+            
+            // Если все коллекции не сработали
+            return {
+                success: false,
+                collection: null
+            };
+        }
+
+        // Добавить сообщение в чат
+        function addMessageToChat(message, messageId) {
+            // Пропускаем сообщения без текста
+            if (!message.text && !message.gif) return;
+            
+            const messageElement = document.createElement('div');
+            const isOwnMessage = message.userId === currentUser.uid;
+            
+            messageElement.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            messageElement.dataset.messageId = messageId;
+            
+            // Форматируем время
+            let timeString = 'только что';
+            if (message.timestamp) {
+                const date = message.timestamp.toDate();
+                timeString = date.toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+            
+            // Создаем содержимое сообщения
+            let messageContent = '';
+            
+            if (message.gif) {
+                messageContent = `
+                    <div class="message-user">${message.userNickname}</div>
+                    <img src="${message.gif}" alt="GIF" style="max-width: 200px; border-radius: 8px;">
+                    <div class="message-time">${timeString}</div>
+                `;
+            } else {
+                messageContent = `
+                    <div class="message-user">${message.userNickname}</div>
+                    ${message.text}
+                    <div class="message-time">${timeString}</div>
+                `;
+            }
+            
+            // Добавляем реакции, если они есть
+            let reactionsHtml = '';
+            if (message.reactions && Object.keys(message.reactions).length > 0) {
+                reactionsHtml = '<div class="message-reactions">';
+                for (const [emoji, users] of Object.entries(message.reactions)) {
+                    const userCount = Object.keys(users).length;
+                    if (userCount > 0) {
+                        const hasReacted = users[currentUser.uid];
+                        reactionsHtml += `
+                            <div class="reaction ${hasReacted ? 'active' : ''}" data-emoji="${emoji}" data-message-id="${messageId}">
+                                ${emoji} <span class="reaction-count">${userCount}</span>
+                            </div>
+                        `;
+                    }
+                }
+                reactionsHtml += '</div>';
+            }
+            
+            messageElement.innerHTML = messageContent + reactionsHtml;
+            
+            // Добавляем кнопку реакции для своих сообщений
+            if (!isOwnMessage) {
+                const reactionBtn = document.createElement('button');
+                reactionBtn.className = 'reaction-btn';
+                reactionBtn.innerHTML = '<i class="fas fa-smile"></i>';
+                reactionBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showReactionPicker(messageId, e.target);
+                });
+                messageElement.appendChild(reactionBtn);
+            }
+            
+            chatMessages.appendChild(messageElement);
+        }
+
+        // Показать системное сообщение
+        function showSystemMessage(text) {
+            const systemMessage = document.createElement('div');
+            systemMessage.className = 'system-message';
+            systemMessage.textContent = text;
+            chatMessages.appendChild(systemMessage);
+            scrollToBottom();
+        }
+
+        // Прокрутка вниз
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Остановка слушателей
+        function stopListeners() {
+            if (messagesListener) {
+                messagesListener();
+                messagesListener = null;
+            }
+            
+            if (usersListener) {
+                usersListener();
+                usersListener = null;
+            }
+        }
+
+        // Инициализация пикера эмодзи
+        function initEmojiPicker() {
+            // Простые эмодзи для демонстрации
+            const emojis = {
+                'smileys': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠'],
+                'hearts': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝'],
+                'hands': ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏'],
+                'animals': ['🐵', '🐒', '🦍', '🦧', '🐶', '🐕', '🦮', '🐕‍🦺', '🐩', '🐺', '🦊', '🦝', '🐱', '🐈', '🐈‍⬛', '🦁', '🐯', '🐅', '🐆', '🐴', '🐎', '🦄', '🦓', '🦌', '🐮', '🐂', '🐃', '🐄', '🐷', '🐖', '🐗', '🐽', '🐏', '🐑', '🐐', '🐪', '🐫', '🦙', '🦒', '🐘', '🦏', '🦛', '🐭', '🐁', '🐀', '🐹', '🐰', '🐇', '🐿️', '🦫', '🦔', '🦇', '🐻', '🐻‍❄️', '🐨', '🐼', '🦥', '🦦', '🦨', '🦘', '🦡'],
+                'food': ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕']
+            };
+            
+            emojiCategories = emojis;
+            
+            // Создаем категории
+            const categoryNames = {
+                'smileys': 'Смайлы',
+                'hearts': 'Сердца',
+                'hands': 'Жесты',
+                'animals': 'Животные',
+                'food': 'Еда'
+            };
+            
+            const categoriesContainer = document.getElementById('emojiCategories');
+            
+            for (const category in emojis) {
+                const button = document.createElement('button');
+                button.className = `emoji-category ${category === currentEmojiCategory ? 'active' : ''}`;
+                button.dataset.category = category;
+                button.textContent = categoryNames[category] || category;
+                button.addEventListener('click', () => switchEmojiCategory(category));
+                categoriesContainer.appendChild(button);
+            }
+            
+            // Загружаем эмодзи для текущей категории
+            loadEmojisForCategory(currentEmojiCategory);
+        }
+
+        // Переключение категории эмодзи
+        function switchEmojiCategory(category) {
+            currentEmojiCategory = category;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.emoji-category').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category);
+            });
+            
+            // Загружаем эмодзи
+            loadEmojisForCategory(category);
+        }
+
+        // Загрузка эмодзи для категории
+        function loadEmojisForCategory(category) {
+            emojiGrid.innerHTML = '';
+            
+            if (emojiCategories[category]) {
+                emojiCategories[category].forEach(emoji => {
+                    const emojiElement = document.createElement('div');
+                    emojiElement.className = 'emoji-item';
+                    emojiElement.textContent = emoji;
+                    emojiElement.addEventListener('click', () => {
+                        insertEmoji(emoji);
+                        emojiPicker.classList.remove('show');
+                    });
+                    emojiGrid.appendChild(emojiElement);
+                });
+            }
+        }
+
+        // Фильтрация эмодзи
+        function filterEmojis() {
+            const searchTerm = emojiSearch.value.toLowerCase();
+            
+            if (!searchTerm) {
+                loadEmojisForCategory(currentEmojiCategory);
+                return;
+            }
+            
+            emojiGrid.innerHTML = '';
+            let foundEmojis = false;
+            
+            // Ищем во всех категориях
+            for (const category in emojiCategories) {
+                emojiCategories[category].forEach(emoji => {
+                    // Для простоты считаем, что все эмодзи подходят если есть поисковый запрос
+                    // В реальном приложении здесь была бы настоящая фильтрация
+                    if (!foundEmojis) {
+                        const emojiElement = document.createElement('div');
+                        emojiElement.className = 'emoji-item';
+                        emojiElement.textContent = emoji;
+                        emojiElement.addEventListener('click', () => {
+                            insertEmoji(emoji);
+                            emojiPicker.classList.remove('show');
+                        });
+                        emojiGrid.appendChild(emojiElement);
+                    }
+                });
+            }
+            
+            if (!foundEmojis) {
+                emojiGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 10px;">Эмодзи не найдены</div>';
+            }
+        }
+
+        // Вставка эмодзи в поле ввода
+        function insertEmoji(emoji) {
+            const input = chatInput;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            
+            input.value = text.substring(0, start) + emoji + text.substring(end);
+            input.selectionStart = input.selectionEnd = start + emoji.length;
+            input.focus();
+        }
+
+        // Переключение пикера эмодзи
+        function toggleEmojiPicker() {
+            emojiPicker.classList.toggle('show');
+            gifPicker.classList.remove('show');
+            
+            if (emojiPicker.classList.contains('show')) {
+                emojiSearch.focus();
+            }
+        }
+
+        // Переключение пикера GIF
+        function toggleGifPicker() {
+            gifPicker.classList.toggle('show');
+            emojiPicker.classList.remove('show');
+            
+            if (gifPicker.classList.contains('show')) {
+                loadTrendingGifs();
+                gifSearch.focus();
+            }
+        }
+
+        // Загрузка популярных GIF
+        function loadTrendingGifs() {
+            // В реальном приложении здесь был бы запрос к Giphy API
+            gifResults.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">GIF временно недоступны</div>';
+        }
+
+        // Поиск GIF
+        function searchGifs() {
+            const searchTerm = gifSearch.value.trim();
+            
+            if (!searchTerm) {
+                loadTrendingGifs();
+                return;
+            }
+            
+            // В реальном приложении здесь был бы запрос к Giphy API
+            gifResults.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">Поиск GIF: "${searchTerm}"<br>GIF временно недоступны</div>`;
+        }
+
+        // Вставка GIF в сообщение
+        function insertGif(gifUrl) {
+            // В реальном приложении здесь была бы отправка GIF
+            chatInput.value = `[GIF: ${gifUrl}]`;
+            gifPicker.classList.remove('show');
+        }
+
+        // Показать пикер реакций
+        function showReactionPicker(messageId, target) {
+            const reactions = ['👍', '❤️', '😂', '😮', '😢', '😡', '🎉', '🔥', '👏', '🙏'];
+            
+            reactionsGrid.innerHTML = '';
+            reactions.forEach(emoji => {
+                const emojiElement = document.createElement('div');
+                emojiElement.className = 'reaction-emoji-large';
+                emojiElement.textContent = emoji;
+                emojiElement.addEventListener('click', () => {
+                    addReaction(messageId, emoji);
+                    hideReactionsModal();
+                });
+                reactionsGrid.appendChild(emojiElement);
+            });
+            
+            reactionsModal.style.display = 'block';
+        }
+
+        // Скрыть модальное окно реакций
+        function hideReactionsModal() {
+            reactionsModal.style.display = 'none';
+        }
+
+        // Добавить реакцию к сообщению
+        async function addReaction(messageId, emoji) {
+            if (!currentUser) return;
+            
+            try {
+                // Пробуем разные коллекции для обновления реакции
+                const collections = ['messages', 'generalChat', 'chat', 'privateMessages', 'chats'];
+                
+                for (const collection of collections) {
+                    try {
+                        const messageRef = db.collection(collection).doc(messageId);
+                        const messageDoc = await messageRef.get();
+                        
+                        if (messageDoc.exists) {
+                            const message = messageDoc.data();
+                            const reactions = message.reactions || {};
+                            
+                            if (reactions[emoji] && reactions[emoji][currentUser.uid]) {
+                                // Удаляем реакцию если она уже есть
+                                delete reactions[emoji][currentUser.uid];
+                                if (Object.keys(reactions[emoji]).length === 0) {
+                                    delete reactions[emoji];
+                                }
+                            } else {
+                                // Добавляем реакцию
+                                if (!reactions[emoji]) {
+                                    reactions[emoji] = {};
+                                }
+                                reactions[emoji][currentUser.uid] = true;
+                            }
+                            
+                            await messageRef.update({ reactions });
+                            console.log(`Реакция обновлена в коллекции: ${collection}`);
+                            break;
+                        }
+                    } catch (error) {
+                        console.warn(`Не удалось обновить реакцию в ${collection}:`, error);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка добавления реакции:', error);
+            }
+        }
+
+        // Показать уведомление
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            // Добавляем класс типа уведомления
+            if (type === 'success') {
+                notification.style.background = '#1DB954';
+            } else if (type === 'error') {
+                notification.style.background = '#e74c3c';
+            } else if (type === 'warning') {
+                notification.style.background = '#f39c12';
+            } else {
+                notification.style.background = '#3498db';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Обработка выхода из приложения
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                // Устанавливаем статус offline при закрытии вкладки
+                db.collection('users').doc(currentUser.uid).update({
+                    isOnline: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        });
     </script>
 </body>
 </html>
