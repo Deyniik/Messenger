@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     
     <style>
         * {
@@ -304,6 +305,39 @@
             margin-left: 5px;
         }
         
+        .message-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 5px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message-image:hover {
+            opacity: 0.9;
+        }
+        
+        .image-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            cursor: pointer;
+        }
+        
+        .image-fullscreen img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
         .message-reactions {
             display: flex;
             gap: 5px;
@@ -401,8 +435,15 @@
             align-items: flex-end;
         }
         
-        .chat-input {
+        .chat-input-wrapper {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .chat-input {
+            width: 100%;
             background: rgba(40, 40, 40, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
@@ -415,6 +456,32 @@
         
         .chat-input:focus {
             border-color: #1DB954;
+        }
+        
+        .chat-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .file-upload-btn {
+            background: rgba(29, 185, 84, 0.3);
+            border: 1px solid #1DB954;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .file-upload-btn:hover {
+            background: rgba(29, 185, 84, 0.5);
         }
         
         .chat-send-btn {
@@ -521,6 +588,23 @@
             margin-left: auto;
             padding: 5px 10px;
         }
+        
+        .upload-progress {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .upload-progress-bar {
+            height: 100%;
+            background: #1DB954;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -577,10 +661,21 @@
                 </div>
                 
                 <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Войдите в систему" disabled>
-                    <button class="chat-send-btn" id="chat-send-btn" disabled>
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Войдите в систему" disabled>
+                        <div class="upload-progress" id="uploadProgress">
+                            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                        </div>
+                    </div>
+                    <div class="chat-buttons">
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        <button class="file-upload-btn" id="fileUploadBtn" title="Отправить фото">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="chat-send-btn" id="chat-send-btn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -624,6 +719,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         // DOM элементы
         const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -634,6 +730,10 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadBtn = document.getElementById('fileUploadBtn');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadProgressBar = document.getElementById('uploadProgressBar');
         const notification = document.getElementById('notification');
         const notificationTitle = document.getElementById('notificationTitle');
         const notificationMessage = document.getElementById('notificationMessage');
@@ -658,7 +758,7 @@
         // Воспроизведение звука уведомления
         function playNotificationSound() {
             const now = Date.now();
-            if (now - lastMessageSoundTime > 1000) { // Защита от спама звуков
+            if (now - lastMessageSoundTime > 1000) {
                 notificationSound.currentTime = 0;
                 notificationSound.play().catch(e => console.log('Ошибка воспроизведения звука:', e));
                 lastMessageSoundTime = now;
@@ -671,7 +771,6 @@
                 playNotificationSound();
             }
             
-            // Браузерные уведомления
             if (document.hidden && "Notification" in window && Notification.permission === "granted") {
                 new Notification(title, {
                     body: message,
@@ -679,7 +778,6 @@
                 });
             }
             
-            // Встроенное уведомление
             notificationTitle.textContent = title;
             notificationMessage.textContent = message;
             notification.className = 'notification';
@@ -694,12 +792,10 @@
         // Обновить UI аутентификации
         function updateAuthUI(user) {
             if (user) {
-                // Запрашиваем разрешение на уведомления
                 if ("Notification" in window && Notification.permission === "default") {
                     Notification.requestPermission();
                 }
 
-                // Пользователь вошел
                 authSection.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; color: white;">
                         <div style="width: 32px; height: 32px; border-radius: 50%; background: #1DB954; display: flex; align-items: center; justify-content: center; font-weight: bold;">
@@ -718,7 +814,6 @@
                 startOnlinePing();
 
             } else {
-                // Пользователь не вошел
                 authSection.innerHTML = `
                     <button class="google-login-btn" id="googleLoginBtn">
                         <i class="fab fa-google"></i> Войти через Google
@@ -733,18 +828,15 @@
         // Обработчик выхода
         function handleLogout() {
             if (currentUser) {
-                // Устанавливаем статус offline при выходе
                 db.collection('messengerUsers').doc(currentUser.uid).set({
                     online: false,
                     lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                     typing: false
                 }, { merge: true }).then(() => {
-                    // Очищаем интервал пинга
                     if (pingInterval) {
                         clearInterval(pingInterval);
                         pingInterval = null;
                     }
-                    // Выходим из Firebase Auth
                     auth.signOut();
                 });
             } else {
@@ -758,7 +850,6 @@
             auth.signInWithPopup(provider)
                 .then((result) => {
                     const user = result.user;
-                    // Сохраняем пользователя
                     return db.collection('messengerUsers').doc(user.uid).set({
                         uid: user.uid,
                         displayName: user.displayName || 'Пользователь',
@@ -780,7 +871,6 @@
 
         // Онлайн пинг
         function startOnlinePing() {
-            // Очищаем предыдущий интервал если есть
             if (pingInterval) {
                 clearInterval(pingInterval);
             }
@@ -803,14 +893,12 @@
             if (now - lastTypingTime > 1000) {
                 lastTypingTime = now;
                 
-                // Устанавливаем статус "тапает"
                 db.collection('messengerUsers').doc(currentUser.uid).set({
                     typing: true,
                     typingTo: selectedUser.uid,
                     lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 
-                // Сбрасываем статус через 3 секунды
                 clearTimeout(typingTimeout);
                 typingTimeout = setTimeout(() => {
                     db.collection('messengerUsers').doc(currentUser.uid).set({
@@ -821,7 +909,7 @@
             }
         }
 
-        // Загрузка всех пользователей (онлайн и офлайн)
+        // Загрузка всех пользователей
         function loadUsers() {
             if (usersUnsubscribe) usersUnsubscribe();
 
@@ -834,7 +922,6 @@
                     snapshot.forEach((doc) => {
                         const user = doc.data();
                         if (user.uid !== currentUser.uid) {
-                            // Проверяем, был ли пользователь активен в последние 15 секунд
                             const lastSeen = user.lastSeen ? user.lastSeen.toDate() : new Date();
                             const now = new Date();
                             const diffSeconds = (now - lastSeen) / 1000;
@@ -864,7 +951,6 @@
                     }
                 });
 
-            // Отслеживаем статус "тапает"
             if (typingUnsubscribe) typingUnsubscribe();
             typingUnsubscribe = db.collection('messengerUsers')
                 .where('typing', '==', true)
@@ -937,19 +1023,17 @@
 
             selectedUser = user;
             
-            // Обновить выделение
             document.querySelectorAll('.user-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
 
-            // Обновить UI
             currentChatUser.textContent = user.displayName || 'Пользователь';
             chatInput.disabled = false;
             chatInput.placeholder = `Сообщение для ${user.displayName || 'Пользователя'}...`;
             chatSendBtn.disabled = false;
+            fileUploadBtn.disabled = false;
 
-            // Загрузить сообщения
             loadMessages();
         }
 
@@ -965,7 +1049,6 @@
 
             let isFirstLoad = true;
 
-            // ИСПРАВЛЕНИЕ: Используем коллекцию privateMessages вместо chat
             messagesUnsubscribe = db.collection('privateMessages')
                 .where('chatId', '==', chatId)
                 .orderBy('timestamp', 'asc')
@@ -973,22 +1056,20 @@
                     chatMessages.innerHTML = '';
 
                     let hasMessages = false;
-                    let lastMessageFromOther = false;
 
                     snapshot.forEach((doc) => {
                         const message = doc.data();
                         
                         const isOwnMessage = message.senderId === currentUser.uid;
                         
-                        // Проверяем, нужно ли проиграть звук (только для новых сообщений от других)
                         if (!isOwnMessage && !isFirstLoad && message.timestamp) {
                             const messageTime = message.timestamp.toDate();
                             const now = new Date();
                             const diff = (now - messageTime) / 1000;
                             
-                            if (diff < 5) { // Сообщение пришло менее 5 секунд назад
+                            if (diff < 5) {
                                 playNotificationSound();
-                                showNotification('Новое сообщение', `${message.senderName}: ${message.text}`, 'info', false);
+                                showNotification('Новое сообщение', `${message.senderName}: ${message.text || '📷 Фото'}`, 'info', false);
                             }
                         }
                         
@@ -1030,6 +1111,11 @@
 
             const editedBadge = message.edited ? '<span class="message-edited">(ред.)</span>' : '';
 
+            let imageHtml = '';
+            if (message.imageUrl) {
+                imageHtml = `<img src="${message.imageUrl}" alt="Изображение" class="message-image" onclick="showFullscreenImage('${message.imageUrl}')">`;
+            }
+
             let reactionsHtml = '';
             if (message.reactions && Object.keys(message.reactions).length > 0) {
                 reactionsHtml = '<div class="message-reactions">';
@@ -1047,23 +1133,21 @@
                 <span class="message-user">${message.senderName || 'Аноним'}:</span>
                 ${message.text || ''}
                 ${editedBadge}
+                ${imageHtml}
                 <span class="message-time">${timeString}</span>
                 ${reactionsHtml}
             `;
 
-            // Контекстное меню для сообщений
             messageDiv.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 showContextMenu(e, message, messageId, isOwnMessage);
             });
 
-            // Быстрые реакции по двойному клику
             messageDiv.addEventListener('dblclick', (e) => {
                 e.stopPropagation();
                 addReaction(messageId, '❤️');
             });
 
-            // Обработчики для реакций
             messageDiv.querySelectorAll('.reaction').forEach(reaction => {
                 reaction.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1076,6 +1160,15 @@
             chatMessages.appendChild(messageDiv);
         }
 
+        // Показать изображение на весь экран
+        function showFullscreenImage(imageUrl) {
+            const fullscreenDiv = document.createElement('div');
+            fullscreenDiv.className = 'image-fullscreen';
+            fullscreenDiv.innerHTML = `<img src="${imageUrl}" alt="Изображение">`;
+            fullscreenDiv.onclick = () => document.body.removeChild(fullscreenDiv);
+            document.body.appendChild(fullscreenDiv);
+        }
+
         // Показать контекстное меню
         function showContextMenu(e, message, messageId, isOwnMessage) {
             selectedMessage = { message, messageId, isOwnMessage };
@@ -1084,7 +1177,6 @@
             contextMenu.style.left = e.pageX + 'px';
             contextMenu.style.top = e.pageY + 'px';
 
-            // Показываем только доступные действия
             document.getElementById('editMessage').style.display = isOwnMessage ? 'block' : 'none';
             document.getElementById('deleteMessage').style.display = isOwnMessage ? 'block' : 'none';
             document.getElementById('addReaction').style.display = 'block';
@@ -1126,7 +1218,6 @@
             if (!selectedMessage) return;
             
             if (confirm('Вы уверены, что хотите удалить это сообщение?')) {
-                // ИСПРАВЛЕНИЕ: Удаляем из коллекции privateMessages
                 db.collection('privateMessages').doc(selectedMessage.messageId).delete()
                     .then(() => {
                         showNotification('Успех', 'Сообщение удалено');
@@ -1145,7 +1236,6 @@
         function saveMessageEdit(newText) {
             if (!selectedMessage || !newText.trim()) return;
             
-            // ИСПРАВЛЕНИЕ: Обновляем в коллекции privateMessages
             db.collection('privateMessages').doc(selectedMessage.messageId).update({
                 text: newText.trim(),
                 edited: true,
@@ -1165,7 +1255,6 @@
             
             const reactionPath = `reactions.${reaction}.${currentUser.uid}`;
             
-            // ИСПРАВЛЕНИЕ: Проверяем в коллекции privateMessages
             db.collection('privateMessages').doc(messageId).get().then(doc => {
                 if (!doc.exists) return;
                 
@@ -1177,17 +1266,14 @@
                 const updateData = {};
                 
                 if (hasReaction) {
-                    // Удаляем реакцию
                     updateData[`reactions.${reaction}.${currentUser.uid}`] = firebase.firestore.FieldValue.delete();
                 } else {
-                    // Добавляем реакцию
                     if (!message.reactions) {
                         updateData['reactions'] = {};
                     }
                     updateData[reactionPath] = true;
                 }
                 
-                // ИСПРАВЛЕНИЕ: Обновляем в коллекции privateMessages
                 db.collection('privateMessages').doc(messageId).update(updateData)
                     .catch(error => {
                         console.error('Ошибка добавления реакции:', error);
@@ -1214,7 +1300,7 @@
             });
         }
 
-        // Отправка сообщений
+        // Отправка текстового сообщения
         function sendMessage() {
             const text = chatInput.value.trim();
             if (!text || !selectedUser || !currentUser) return;
@@ -1230,13 +1316,11 @@
                 edited: false
             };
 
-            // ИСПРАВЛЕНИЕ: Сохраняем в отдельной коллекции для приватных сообщений
             db.collection('privateMessages').add(message)
                 .then(() => {
                     chatInput.value = '';
                     scrollToBottom();
                     
-                    // Сбрасываем статус тапания
                     db.collection('messengerUsers').doc(currentUser.uid).set({
                         typing: false,
                         typingTo: null
@@ -1246,6 +1330,54 @@
                     console.error('Ошибка отправки:', error);
                     showNotification('Ошибка', 'Ошибка отправки', 'error');
                 });
+        }
+
+        // Отправка изображения
+        function sendImage(file) {
+            if (!selectedUser || !currentUser) return;
+
+            uploadProgress.style.display = 'block';
+            uploadProgressBar.style.width = '0%';
+
+            const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
+            const fileName = `images/${chatId}/${Date.now()}_${file.name}`;
+            const storageRef = storage.ref().child(fileName);
+
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    uploadProgressBar.style.width = progress + '%';
+                },
+                (error) => {
+                    console.error('Ошибка загрузки:', error);
+                    showNotification('Ошибка', 'Ошибка загрузки изображения', 'error');
+                    uploadProgress.style.display = 'none';
+                },
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        const message = {
+                            chatId: chatId,
+                            senderId: currentUser.uid,
+                            senderName: currentUser.displayName || 'Пользователь',
+                            imageUrl: downloadURL,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            edited: false
+                        };
+
+                        return db.collection('privateMessages').add(message);
+                    }).then(() => {
+                        uploadProgress.style.display = 'none';
+                        scrollToBottom();
+                        showNotification('Успех', 'Фото отправлено');
+                    }).catch((error) => {
+                        console.error('Ошибка отправки:', error);
+                        showNotification('Ошибка', 'Ошибка отправки фото', 'error');
+                        uploadProgress.style.display = 'none';
+                    });
+                }
+            );
         }
 
         function scrollToBottom() {
@@ -1266,6 +1398,7 @@
             chatInput.disabled = true;
             chatInput.placeholder = 'Войдите в систему';
             chatSendBtn.disabled = true;
+            fileUploadBtn.disabled = true;
             selectedUser = null;
             typingStatus.style.display = 'none';
         }
@@ -1273,7 +1406,6 @@
         // Обработчик закрытия страницы
         function handleBeforeUnload() {
             if (currentUser) {
-                // Устанавливаем статус offline при закрытии страницы
                 db.collection('messengerUsers').doc(currentUser.uid).set({
                     online: false,
                     typing: false,
@@ -1295,6 +1427,22 @@
         chatSendBtn.addEventListener('click', function(e) {
             e.preventDefault();
             sendMessage();
+        });
+
+        fileUploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification('Ошибка', 'Файл слишком большой (макс. 10MB)', 'error');
+                    return;
+                }
+                sendImage(file);
+                fileInput.value = '';
+            }
         });
 
         // Закрытие контекстного меню при клике вне его
@@ -1340,16 +1488,13 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
-            // Обработчики закрытия страницы
             window.addEventListener('beforeunload', handleBeforeUnload);
             window.addEventListener('pagehide', handleBeforeUnload);
             
-            // Запрашиваем разрешение на уведомления
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
 
-            // Предзагрузка звука
             notificationSound.load();
         });
     </script>
