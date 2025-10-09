@@ -484,6 +484,11 @@
             background: rgba(29, 185, 84, 0.5);
         }
         
+        .file-upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         .chat-send-btn {
             background: rgba(29, 185, 84, 0.3);
             border: 1px solid #1DB954;
@@ -669,7 +674,7 @@
                     </div>
                     <div class="chat-buttons">
                         <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                        <button class="file-upload-btn" id="fileUploadBtn" title="Отправить фото">
+                        <button class="file-upload-btn" id="fileUploadBtn" title="Отправить фото" disabled>
                             <i class="fas fa-image"></i>
                         </button>
                         <button class="chat-send-btn" id="chat-send-btn" disabled>
@@ -820,7 +825,12 @@
                     </button>
                 `;
 
-                document.getElementById('googleLoginBtn').addEventListener('click', signInWithGoogle);
+                // ДОБАВЛЕНО: Перепривязываем обработчик кнопки входа
+                const newLoginBtn = document.getElementById('googleLoginBtn');
+                if (newLoginBtn) {
+                    newLoginBtn.addEventListener('click', signInWithGoogle);
+                }
+
                 showGeneralChat();
             }
         }
@@ -965,7 +975,7 @@
                     });
 
                     if (typingUsers.length > 0) {
-                        typingStatus.textContent = `${typingUsers.join(', ')} тапает...`;
+                        typingStatus.textContent = `${typingUsers.join(', ')} печатает...`;
                         typingStatus.style.display = 'block';
                     } else {
                         typingStatus.style.display = 'none';
@@ -996,7 +1006,7 @@
             li.className = 'user-item';
             
             const lastSeen = user.lastSeen ? user.lastSeen.toDate() : null;
-            const statusText = isTyping ? 'тапает...' : 
+            const statusText = isTyping ? 'печатает...' : 
                              isOnline ? 'онлайн' : 
                              formatLastSeen(lastSeen);
 
@@ -1023,17 +1033,20 @@
 
             selectedUser = user;
             
+            // Обновить выделение
             document.querySelectorAll('.user-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
 
+            // Обновить UI - ВАЖНО: разблокируем обе кнопки
             currentChatUser.textContent = user.displayName || 'Пользователь';
             chatInput.disabled = false;
             chatInput.placeholder = `Сообщение для ${user.displayName || 'Пользователя'}...`;
             chatSendBtn.disabled = false;
-            fileUploadBtn.disabled = false;
+            fileUploadBtn.disabled = false; // РАЗБЛОКИРУЕМ кнопку фото!
 
+            // Загрузить сообщения
             loadMessages();
         }
 
@@ -1169,141 +1182,13 @@
             document.body.appendChild(fullscreenDiv);
         }
 
-        // Показать контекстное меню
-        function showContextMenu(e, message, messageId, isOwnMessage) {
-            selectedMessage = { message, messageId, isOwnMessage };
-            
-            contextMenu.style.display = 'block';
-            contextMenu.style.left = e.pageX + 'px';
-            contextMenu.style.top = e.pageY + 'px';
-
-            document.getElementById('editMessage').style.display = isOwnMessage ? 'block' : 'none';
-            document.getElementById('deleteMessage').style.display = isOwnMessage ? 'block' : 'none';
-            document.getElementById('addReaction').style.display = 'block';
-        }
-
-        // Редактирование сообщения
-        function editMessage() {
-            if (!selectedMessage) return;
-            
-            const messageDiv = document.querySelector(`[data-message-id="${selectedMessage.messageId}"]`);
-            const messageText = selectedMessage.message.text;
-            
-            messageDiv.innerHTML = `
-                <span class="message-user">${selectedMessage.message.senderName}:</span>
-                <input type="text" class="edit-message-input" value="${messageText}">
-                <div class="edit-buttons">
-                    <button class="edit-btn edit-save">Сохранить</button>
-                    <button class="edit-btn edit-cancel">Отмена</button>
-                </div>
-            `;
-            
-            const input = messageDiv.querySelector('.edit-message-input');
-            input.focus();
-            input.select();
-            
-            messageDiv.querySelector('.edit-save').addEventListener('click', () => {
-                saveMessageEdit(input.value);
-            });
-            
-            messageDiv.querySelector('.edit-cancel').addEventListener('click', () => {
-                loadMessages();
-            });
-            
-            contextMenu.style.display = 'none';
-        }
-
-        // Удаление сообщения
-        function deleteMessage() {
-            if (!selectedMessage) return;
-            
-            if (confirm('Вы уверены, что хотите удалить это сообщение?')) {
-                db.collection('privateMessages').doc(selectedMessage.messageId).delete()
-                    .then(() => {
-                        showNotification('Успех', 'Сообщение удалено');
-                        loadMessages();
-                    })
-                    .catch(error => {
-                        console.error('Ошибка удаления:', error);
-                        showNotification('Ошибка', 'Не удалось удалить сообщение', 'error');
-                    });
-            }
-            
-            contextMenu.style.display = 'none';
-        }
-
-        // Сохранение отредактированного сообщения
-        function saveMessageEdit(newText) {
-            if (!selectedMessage || !newText.trim()) return;
-            
-            db.collection('privateMessages').doc(selectedMessage.messageId).update({
-                text: newText.trim(),
-                edited: true,
-                editedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                loadMessages();
-                showNotification('Успех', 'Сообщение отредактировано');
-            }).catch(error => {
-                console.error('Ошибка редактирования:', error);
-                showNotification('Ошибка', 'Не удалось отредактировать', 'error');
-            });
-        }
-
-        // Добавление реакции
-        function addReaction(messageId, reaction) {
-            if (!currentUser) return;
-            
-            const reactionPath = `reactions.${reaction}.${currentUser.uid}`;
-            
-            db.collection('privateMessages').doc(messageId).get().then(doc => {
-                if (!doc.exists) return;
-                
-                const message = doc.data();
-                const hasReaction = message.reactions && 
-                                  message.reactions[reaction] && 
-                                  message.reactions[reaction][currentUser.uid];
-                
-                const updateData = {};
-                
-                if (hasReaction) {
-                    updateData[`reactions.${reaction}.${currentUser.uid}`] = firebase.firestore.FieldValue.delete();
-                } else {
-                    if (!message.reactions) {
-                        updateData['reactions'] = {};
-                    }
-                    updateData[reactionPath] = true;
-                }
-                
-                db.collection('privateMessages').doc(messageId).update(updateData)
-                    .catch(error => {
-                        console.error('Ошибка добавления реакции:', error);
-                    });
-            });
-        }
-
-        // Показать быстрые реакции
-        function showQuickReactions(element) {
-            const rect = element.getBoundingClientRect();
-            quickReactions.style.display = 'flex';
-            quickReactions.style.left = (rect.left + rect.width / 2 - quickReactions.offsetWidth / 2) + 'px';
-            quickReactions.style.top = (rect.top - quickReactions.offsetHeight - 5) + 'px';
-            
-            quickReactions.querySelectorAll('.quick-reaction').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    if (selectedMessage) {
-                        addReaction(selectedMessage.messageId, btn.dataset.reaction);
-                        quickReactions.style.display = 'none';
-                        contextMenu.style.display = 'none';
-                    }
-                };
-            });
-        }
-
         // Отправка текстового сообщения
         function sendMessage() {
             const text = chatInput.value.trim();
-            if (!text || !selectedUser || !currentUser) return;
+            if (!text || !selectedUser || !currentUser) {
+                console.log('Не могу отправить:', { text, selectedUser, currentUser });
+                return;
+            }
 
             const chatId = [currentUser.uid, selectedUser.uid].sort().join('_');
 
@@ -1316,11 +1201,15 @@
                 edited: false
             };
 
+            console.log('Отправляю сообщение:', message);
+
             db.collection('privateMessages').add(message)
                 .then(() => {
+                    console.log('Сообщение отправлено');
                     chatInput.value = '';
                     scrollToBottom();
                     
+                    // Сбрасываем статус печатания
                     db.collection('messengerUsers').doc(currentUser.uid).set({
                         typing: false,
                         typingTo: null
@@ -1415,54 +1304,47 @@
             }
         }
 
-        // Обработчики событий
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !chatSendBtn.disabled) {
-                sendMessage();
-            }
-        });
-
-        chatInput.addEventListener('input', handleTyping);
-
-        chatSendBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            sendMessage();
-        });
-
-        fileUploadBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 10 * 1024 * 1024) {
-                    showNotification('Ошибка', 'Файл слишком большой (макс. 10MB)', 'error');
-                    return;
+        // ИНИЦИАЛИЗАЦИЯ ОБРАБОТЧИКОВ СОБЫТИЙ
+        function initializeEventListeners() {
+            // Обработчик отправки сообщения по Enter
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !chatSendBtn.disabled) {
+                    sendMessage();
                 }
-                sendImage(file);
-                fileInput.value = '';
-            }
-        });
+            });
 
-        // Закрытие контекстного меню при клике вне его
-        document.addEventListener('click', (e) => {
-            if (!contextMenu.contains(e.target)) {
-                contextMenu.style.display = 'none';
-            }
-            if (!quickReactions.contains(e.target)) {
-                quickReactions.style.display = 'none';
-            }
-        });
+            // Обработчик ввода для статуса "печатает"
+            chatInput.addEventListener('input', handleTyping);
 
-        // Обработчики контекстного меню
-        document.getElementById('editMessage').addEventListener('click', editMessage);
-        document.getElementById('addReaction').addEventListener('click', () => {
-            if (selectedMessage) {
-                showQuickReactions(contextMenu);
+            // Обработчик кнопки отправки
+            chatSendBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                sendMessage();
+            });
+
+            // Обработчик кнопки загрузки фото
+            fileUploadBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Обработчик выбора файла
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 10 * 1024 * 1024) {
+                        showNotification('Ошибка', 'Файл слишком большой (макс. 10MB)', 'error');
+                        return;
+                    }
+                    sendImage(file);
+                    fileInput.value = '';
+                }
+            });
+
+            // Обработчик кнопки входа (при загрузке страницы)
+            if (googleLoginBtn) {
+                googleLoginBtn.addEventListener('click', signInWithGoogle);
             }
-        });
-        document.getElementById('deleteMessage').addEventListener('click', deleteMessage);
+        }
 
         // Слушатель аутентификации
         auth.onAuthStateChanged((user) => {
@@ -1486,8 +1368,13 @@
             }
         });
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница загружена, инициализируем обработчики...');
+            
+            // Инициализируем все обработчики событий
+            initializeEventListeners();
+            
             window.addEventListener('beforeunload', handleBeforeUnload);
             window.addEventListener('pagehide', handleBeforeUnload);
             
@@ -1496,6 +1383,8 @@
             }
 
             notificationSound.load();
+            
+            console.log('Инициализация завершена');
         });
     </script>
 </body>
