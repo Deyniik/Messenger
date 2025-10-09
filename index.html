@@ -64,7 +64,7 @@
         .loading-gif {
             width: 200px;
             height: 200px;
-            background: url('https://i.pinimg.com/originals/3b/06/ee/3b06ee2cc6a317ccdc098b4ab36a8388.gif') center/cover no-repeat;
+            background: url('https://i.pinimg.com/originals/47/37/f3/4737f384e164cab17788950cca6a312c.gif') center/cover no-repeat;
             opacity: 1 !important;
             animation: none !important;
         }
@@ -323,8 +323,28 @@
             flex-direction: column;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
+            overflow: hidden;
             height: 100%;
+        }
+        
+        .posts-container {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 5px;
+        }
+        
+        .posts-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .posts-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .posts-container::-webkit-scrollbar-thumb {
+            background: #1DB954;
+            border-radius: 3px;
         }
         
         .right-panel {
@@ -504,7 +524,7 @@
         }
         
         .post-time {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             color: #B3B3B3;
         }
         
@@ -514,12 +534,17 @@
             font-size: 0.9rem;
         }
         
+        .post-image-container {
+            margin-bottom: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
         .post-image {
             width: 100%;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            max-height: 350px;
-            object-fit: cover;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
         }
         
         /* Улучшенные кнопки лайков и комментариев */
@@ -724,6 +749,21 @@
         .suggestions-container {
             overflow-y: auto;
             flex: 1;
+            padding-right: 5px;
+        }
+        
+        .suggestions-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .suggestions-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        
+        .suggestions-container::-webkit-scrollbar-thumb {
+            background: #1DB954;
+            border-radius: 2px;
         }
         
         .suggestion-item {
@@ -967,6 +1007,7 @@
             max-width: 100%;
             max-height: 250px;
             border-radius: 6px;
+            object-fit: contain;
         }
         
         .remove-image {
@@ -1160,7 +1201,7 @@
                 </div>
                 
                 <!-- Лента постов -->
-                <div id="posts-feed">
+                <div class="posts-container" id="posts-feed">
                     <!-- Посты будут загружаться здесь -->
                 </div>
             </div>
@@ -1711,7 +1752,11 @@
                 
                 let imageHtml = '';
                 if (post.imageUrl) {
-                    imageHtml = `<img src="${post.imageUrl}" class="post-image" alt="Изображение поста">`;
+                    imageHtml = `
+                        <div class="post-image-container">
+                            <img src="${post.imageUrl}" class="post-image" alt="Изображение поста">
+                        </div>
+                    `;
                 }
                 
                 let commentsHtml = '';
@@ -1772,6 +1817,9 @@
                 likeBtn.addEventListener('click', () => likePost(postId, likeBtn));
                 commentBtn.addEventListener('click', () => {
                     commentsSection.style.display = commentsSection.style.display === 'block' ? 'none' : 'block';
+                    if (commentsSection.style.display === 'block') {
+                        commentInput.focus();
+                    }
                 });
                 commentSubmitBtn.addEventListener('click', () => addComment(postId, commentInput));
                 
