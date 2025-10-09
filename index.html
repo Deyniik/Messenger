@@ -12,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     
     <style>
         * {
@@ -628,6 +627,22 @@
             opacity: 0.1;
         }
         
+        .upload-progress {
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 6px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .upload-progress-bar {
+            height: 100%;
+            background: #1DB954;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
         @media (max-width: 900px) {
             .content {
                 flex-direction: column;
@@ -728,6 +743,9 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+                    <div class="upload-progress" id="upload-progress">
+                        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                    </div>
                     <div class="post-actions">
                         <div>
                             <button class="post-media-btn" id="add-image-btn">
@@ -771,7 +789,9 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
+
+        // API ключ для imgBB
+        const IMGBB_API_KEY = 'b16725851b31245c5927dda68e351446';
 
         window.onload = function() {
             setTimeout(function() {
@@ -799,6 +819,8 @@
             const imagePreview = document.getElementById('image-preview');
             const previewImage = document.getElementById('preview-image');
             const removeImageBtn = document.getElementById('remove-image');
+            const uploadProgress = document.getElementById('upload-progress');
+            const uploadProgressBar = document.getElementById('upload-progress-bar');
             const postsFeed = document.getElementById('posts-feed');
             const profileAvatar = document.getElementById('profile-avatar');
             const profileUsername = document.getElementById('profile-username');
@@ -983,6 +1005,12 @@
             imageUpload.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
+                    // Проверяем размер файла (максимум 10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                        showNotification('Изображение слишком большое (макс. 10MB)', 'error');
+                        return;
+                    }
+                    
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         previewImage.src = event.target.result;
@@ -1001,9 +1029,48 @@
                 postSubmitBtn.disabled = postInput.value.trim() === '';
             });
 
-            function createPost(text, imageFile) {
+            // Функция для загрузки изображения на imgBB
+            async function uploadImageToImgBB(imageFile) {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                
+                // Показываем прогресс загрузки
+                uploadProgress.style.display = 'block';
+                uploadProgressBar.style.width = '30%';
+                
+                try {
+                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    uploadProgressBar.style.width = '100%';
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        return data.data.url;
+                    } else {
+                        throw new Error(data.error.message || 'Ошибка загрузки изображения');
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки на imgBB:', error);
+                    throw error;
+                } finally {
+                    setTimeout(() => {
+                        uploadProgress.style.display = 'none';
+                        uploadProgressBar.style.width = '0%';
+                    }, 1000);
+                }
+            }
+
+            async function createPost(text, imageFile) {
                 if (!currentUser) return;
                 
+                // Блокируем кнопку отправки
+                postSubmitBtn.disabled = true;
+                postSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
                 const postData = {
                     userId: currentUser.uid,
                     username: userNickname,
@@ -1014,43 +1081,33 @@
                     shares: 0
                 };
 
-                if (imageFile) {
-                    const storageRef = storage.ref('posts/' + Date.now() + '_' + imageFile.name);
+                try {
+                    if (imageFile) {
+                        // Загружаем изображение на imgBB
+                        const imageUrl = await uploadImageToImgBB(imageFile);
+                        postData.imageUrl = imageUrl;
+                    }
                     
-                    storageRef.put(imageFile)
-                        .then(snapshot => {
-                            return snapshot.ref.getDownloadURL();
-                        })
-                        .then(imageUrl => {
-                            postData.imageUrl = imageUrl;
-                            savePostToFirestore(postData);
-                        })
-                        .catch(error => {
-                            console.error('Ошибка загрузки изображения:', error);
-                            showNotification('Ошибка загрузки изображения', 'error');
-                            // Сохраняем пост без изображения
-                            savePostToFirestore(postData);
-                        });
-                } else {
-                    savePostToFirestore(postData);
+                    // Сохраняем пост в Firestore
+                    await db.collection('posts').add(postData);
+                    
+                    // Очищаем форму
+                    postInput.value = '';
+                    imagePreview.style.display = 'none';
+                    selectedImage = null;
+                    imageUpload.value = '';
+                    postSubmitBtn.disabled = true;
+                    postSubmitBtn.innerHTML = 'Опубликовать';
+                    
+                    showNotification('Пост опубликован!', 'success');
+                    updateProfileStats();
+                    
+                } catch (error) {
+                    console.error('Ошибка создания поста:', error);
+                    showNotification('Ошибка публикации: ' + error.message, 'error');
+                    postSubmitBtn.disabled = false;
+                    postSubmitBtn.innerHTML = 'Опубликовать';
                 }
-            }
-
-            function savePostToFirestore(postData) {
-                db.collection('posts').add(postData)
-                    .then(() => {
-                        postInput.value = '';
-                        imagePreview.style.display = 'none';
-                        selectedImage = null;
-                        imageUpload.value = '';
-                        postSubmitBtn.disabled = true;
-                        showNotification('Пост опубликован!', 'success');
-                        updateProfileStats();
-                    })
-                    .catch(error => {
-                        console.error('Ошибка публикации:', error);
-                        showNotification('Ошибка публикации', 'error');
-                    });
             }
 
             function loadPosts() {
